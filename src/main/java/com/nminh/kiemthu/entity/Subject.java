@@ -22,6 +22,9 @@ public class Subject {
     @Column(name = "credits", nullable = false)
     private int credits; // số tín chỉ
 
+    @Column(name = "module_coefficient" ,nullable = false)
+    private double module_coefficient ;//hệ số học phần
+
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
