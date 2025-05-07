@@ -2,10 +2,13 @@ package com.nminh.kiemthu.entity;
 
 import com.nminh.kiemthu.enums.StatusPayment;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TeacherSalary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.Data;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -12,7 +12,10 @@ import java.util.List;
 
 //  ---- HỌC Kỳ ----
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Semester {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

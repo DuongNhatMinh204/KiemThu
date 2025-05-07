@@ -2,12 +2,15 @@ package com.nminh.kiemthu.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Department {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

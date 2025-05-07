@@ -2,17 +2,20 @@ package com.nminh.kiemthu.entity;
 
 import com.nminh.kiemthu.constants.Constant;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ClassRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private String className;
 
     @Column(name = "number_of_student", nullable = false)
     private int numberOfStudents; // số sinh viên
@@ -51,10 +54,9 @@ public class ClassRoom {
             return 0 ;
         }
     }
-    public ClassRoom(){
-    }
 
-    public ClassRoom( int numberOfStudents, Semester semester, Subject subject,Teacher teacher) {
+    public ClassRoom(String className, int numberOfStudents, Semester semester, Subject subject,Teacher teacher) {
+        this.className = className;
         this.numberOfStudents = numberOfStudents;
         this.classCoefficient = determineCoeficient(numberOfStudents);
         this.semester = semester;

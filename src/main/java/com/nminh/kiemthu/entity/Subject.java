@@ -3,14 +3,17 @@ package com.nminh.kiemthu.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.Data;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 //  ---- MÔN HỌC----
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

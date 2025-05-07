@@ -4,14 +4,17 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nminh.kiemthu.enums.Degree;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
