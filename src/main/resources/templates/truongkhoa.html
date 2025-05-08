@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang Quản Lý Trưởng Khoa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar">
+    <h5>🌟 Trưởng Khoa</h5>
+    <ul class="nav flex-column">
+        <li class="nav-item"><a class="nav-link" href="#" onclick="showSubjectPanel()">Quản lý môn học</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Quản lý lớp học phần</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Quản lý phân công</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Theo dõi giờ dạy</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Xem kỳ học</a></li>
+    </ul>
+</div>
+
+<!-- Main Content -->
+<div class="content">
+    <div id="subjectPanel" style="display: none;">
+        <h4>📘 Quản Lý Môn Học</h4>
+        <div class="mb-3">
+            <label for="departmentSelect" class="form-label">Chọn khoa:</label>
+            <select class="form-select" id="departmentSelect">
+                <option value="">-- Vui lòng chọn khoa --</option>
+            </select>
+            <button class="btn btn-primary mt-2" onclick="fetchSubjects()">🔍 Tìm kiếm</button>
+            <button class="btn btn-success mt-2" onclick="showAddSubjectForm()">➕ Thêm môn học</button>
+        </div>
+
+        <!-- Form thêm môn học -->
+        <div id="addSubjectForm" style="display: none;" class="border p-3 mb-4">
+            <h5>Thêm Môn Học Mới</h5>
+            <div class="mb-3">
+                <label for="subjectName" class="form-label">Tên môn học:</label>
+                <input type="text" class="form-control" id="subjectName" placeholder="Nhập tên môn học">
+            </div>
+            <div class="mb-3">
+                <label for="credits" class="form-label">Số tín chỉ:</label>
+                <input type="number" class="form-control" id="credits" placeholder="Nhập số tín chỉ">
+            </div>
+            <div class="mb-3">
+                <label for="moduleCoefficient" class="form-label">Hệ số học phần:</label>
+                <input type="number" step="0.1" class="form-control" id="moduleCoefficient" placeholder="Nhập hệ số học phần">
+            </div>
+            <div class="mb-3">
+                <label for="departmentSelectForm" class="form-label">Chọn khoa:</label>
+                <select class="form-select" id="departmentSelectForm">
+                    <option value="">-- Vui lòng chọn khoa --</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="submitNewSubject()">💾 Lưu</button>
+            <button class="btn btn-secondary" onclick="hideAddSubjectForm()">❌ Hủy</button>
+        </div>
+
+        <table class="table table-bordered" id="subjectTable">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Tên môn học</th>
+                <th>Số tín chỉ</th>
+                <th>Hệ số</th>
+                <th>Khoa</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    async function showSubjectPanel() {
+        document.getElementById('subjectPanel').style.display = 'block';
+        const res = await fetch('/admin/department/getAll');
+        const json = await res.json();
+        const select = document.getElementById('departmentSelect');
+        const selectForm = document.getElementById('departmentSelectForm');
+        select.innerHTML = '<option value="">-- Vui lòng chọn khoa --</option>';
+        selectForm.innerHTML = '<option value="">-- Vui lòng chọn khoa --</option>';
+        json.data.forEach(dept => {
+            const opt = document.createElement('option');
+            opt.value = dept.id;
+            opt.textContent = dept.fullName;
+            select.appendChild(opt);
+
+            const optForm = document.createElement('option');
+            optForm.value = dept.id;
+            optForm.textContent = dept.fullName;
+            selectForm.appendChild(optForm);
+        });
+    }
+
+    async function fetchSubjects() {
+        const deptId = document.getElementById('departmentSelect').value;
+        if (!deptId) return alert('Vui lòng chọn một khoa.');
+
+        const res = await fetch(`/admin/subject/view-in-department/${deptId}`);
+        const json = await res.json();
+        const tbody = document.querySelector('#subjectTable tbody');
+        tbody.innerHTML = '';
+        json.data.forEach((subject, index) => {
+            const row = `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${subject.subjectName}</td>
+            <td>${subject.credits}</td>
+            <td>${subject.module_coefficient}</td>
+            <td>${subject.department.shortName}</td>
+          </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function showAddSubjectForm() {
+        document.getElementById('addSubjectForm').style.display = 'block';
+    }
+
+    function hideAddSubjectForm() {
+        document.getElementById('addSubjectForm').style.display = 'none';
+        // Xóa dữ liệu trong form
+        document.getElementById('subjectName').value = '';
+        document.getElementById('credits').value = '';
+        document.getElementById('moduleCoefficient').value = '';
+        document.getElementById('departmentSelectForm').value = '';
+    }
+
+    async function submitNewSubject() {
+        const subjectName = document.getElementById('subjectName').value.trim();
+        const credits = document.getElementById('credits').value;
+        const moduleCoefficient = document.getElementById('moduleCoefficient').value;
+        const departmentId = document.getElementById('departmentSelectForm').value;
+
+        if (!subjectName || !credits || !moduleCoefficient || !departmentId) {
+            alert('Vui lòng điền đầy đủ thông tin.');
+            return;
+        }
+
+        const data = {
+            subjectName: subjectName,
+            credits: parseInt(credits),
+            module_coefficient: parseFloat(moduleCoefficient),
+            departmentId: parseInt(departmentId)
+        };
+
+        try {
+            const res = await fetch('/admin/subject/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                alert('Thêm môn học thành công!');
+                hideAddSubjectForm();
+                // Nếu người dùng đang xem môn học của khoa vừa thêm, cập nhật danh sách
+                const currentDeptId = document.getElementById('departmentSelect').value;
+                if (currentDeptId === departmentId.toString()) {
+                    fetchSubjects();
+                }
+            } else {
+                const errorData = await res.json();
+                alert('Lỗi khi thêm môn học: ' + (errorData.message || 'Không rõ lỗi.'));
+            }
+        } catch (error) {
+            alert('Đã xảy ra lỗi khi gửi yêu cầu: ' + error.message);
+        }
+    }
+</script>
+</body>
+</html>

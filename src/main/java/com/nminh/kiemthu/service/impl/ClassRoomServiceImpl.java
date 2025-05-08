@@ -1,19 +1,15 @@
 package com.nminh.kiemthu.service.impl;
 
-import com.nminh.kiemthu.entity.ClassRoom;
-import com.nminh.kiemthu.entity.Semester;
-import com.nminh.kiemthu.entity.Subject;
-import com.nminh.kiemthu.entity.Teacher;
+import com.nminh.kiemthu.entity.*;
 import com.nminh.kiemthu.enums.ErrorCode;
 import com.nminh.kiemthu.exception.AppException;
 import com.nminh.kiemthu.model.request.ClassRoomCreateDTO;
-import com.nminh.kiemthu.repository.ClassRoomRepository;
-import com.nminh.kiemthu.repository.SemesterRepository;
-import com.nminh.kiemthu.repository.SubjectRepository;
-import com.nminh.kiemthu.repository.TeacherRepository;
+import com.nminh.kiemthu.repository.*;
 import com.nminh.kiemthu.service.ClassroomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ClassRoomServiceImpl implements ClassroomService {
@@ -26,6 +22,8 @@ public class ClassRoomServiceImpl implements ClassroomService {
     private TeacherRepository teacherRepository;
     @Autowired
     private ClassRoomRepository classRoomRepository;
+    @Autowired
+    private DepartmentRepository departmentRepository;
 
     @Override
     public ClassRoom createClassroom(ClassRoomCreateDTO classRoomCreateDTO) {
@@ -39,5 +37,18 @@ public class ClassRoomServiceImpl implements ClassroomService {
         ClassRoom classRoom = new ClassRoom(classRoomCreateDTO.getClassName(),classRoomCreateDTO.getNumberOfStudents(), semester, subject, teacher);
 
         return classRoomRepository.save(classRoom);
+    }
+
+    @Override
+    public List<ClassRoom> getListClassrooms(Long departmentId, Long semesterId) {
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(()-> new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
+        Semester semester = semesterRepository.findById(semesterId)
+                .orElseThrow(()-> new AppException(ErrorCode.SEMESTER_NOT_FOUND));
+        List<ClassRoom> res = classRoomRepository.findByDepartmentAndSemester(departmentId,semesterId) ;
+        if(res.isEmpty()){
+            throw new AppException(ErrorCode.NOT_EXISTS_SUBJECT_IN_THIS_SEMESTER_OF_DEPARTMENT);
+        }
+        return res;
     }
 }

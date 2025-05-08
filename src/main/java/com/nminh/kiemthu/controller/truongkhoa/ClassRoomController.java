@@ -7,10 +7,9 @@ import com.nminh.kiemthu.service.ClassroomService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/classroom")
@@ -18,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClassRoomController {
     @Autowired
     private ClassroomService classroomService;
+
+    // TẠO MỚI LỚP HỌC PHẦN
     @PostMapping("/create")
     public ApiResponse createClassRoom(@Valid @RequestBody ClassRoomCreateDTO classRoomCreateDTO) {
         log.info("ClassRoomController.createClassRoom");
@@ -26,7 +27,16 @@ public class ClassRoomController {
         response.setData(classRoom);
         response.setMessage("ClassRoom created");
         return response;
+    }
+    // xem danh sách các lớp học phần do khoa phụ trách trong từng kỳ học.
+    @GetMapping("/view")
+    public ApiResponse viewClassRoom(@RequestParam Long departmentId , @RequestParam Long semesterId) {
+        log.info("ClassRoomController.viewClassRoom");
+        ApiResponse response = new ApiResponse();
+        List<ClassRoom> res = classroomService.getListClassrooms(departmentId, semesterId);
+        response.setData(res);
+        response.setMessage("ClassRoom viewed");
+        return response;
 
     }
-
 }

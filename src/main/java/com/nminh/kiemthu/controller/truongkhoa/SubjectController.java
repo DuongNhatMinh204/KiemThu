@@ -7,10 +7,9 @@ import com.nminh.kiemthu.service.SubjectService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -19,6 +18,7 @@ public class SubjectController {
     @Autowired
     private SubjectService subjectService;
 
+    // TẠO MỚI MÔN HỌC
     @PostMapping("/create")
     public ApiResponse create(@Valid @RequestBody SubjectCreateDTO subjectCreateDTO) {
         log.info("Create subject: {}", subjectCreateDTO);
@@ -27,6 +27,28 @@ public class SubjectController {
         apiResponse.setData(subject);
         apiResponse.setMessage("Subject created");
         log.info("Subject created: {}", subject);
+        return apiResponse;
+    }
+
+    // XEM DANH SÁCH MÔN HỌC  CỦA KHOA
+    @GetMapping("/view-in-department/{id}")
+    public ApiResponse viewSubjectInDepartment(@PathVariable Long id) {
+        log.info("View subject in department: {}", id);
+        ApiResponse apiResponse = new ApiResponse();
+        List<Subject> subjectList = subjectService.getSubjectsInDepartment(id) ;
+        apiResponse.setData(subjectList);
+        apiResponse.setMessage("Subject viewed in department");
+        log.info("Subject viewed in department: {}", subjectList);
+        return apiResponse;
+    }
+    @PutMapping("/change/{id}")
+    public ApiResponse change(@PathVariable Long id ,@RequestBody SubjectCreateDTO subjectChangeDTO) {
+        log.info("Change subject: {}", id);
+        ApiResponse apiResponse = new ApiResponse();
+        Subject subject = subjectService.change(id, subjectChangeDTO);
+        apiResponse.setData(subject);
+        apiResponse.setMessage("Subject changed");
+        log.info("Subject changed: {}", subject);
         return apiResponse;
     }
 }
