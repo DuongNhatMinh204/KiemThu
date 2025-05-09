@@ -383,7 +383,7 @@
             <option value="PHO_GIAO_SU">Phó Giáo Sư</option>
         </select>
 
-        <select class="form-control mb-2" name="departmentId" id="departmentDropdown" required>
+        <select class="form-control mb-2" name="departmentId" id="departmentDropdown12" required>
             <option value="">-- Chọn Khoa --</option>
         </select>
         <button type="submit" class="btn btn-success">Lưu</button>
@@ -713,7 +713,35 @@ async function fetchClassrooms() {
         }
     });
 </script>
+<script>
+    function loadDepartments1() {
+        console.log("📥 loadDepartments called");
 
+        fetch("/admin/department/getAll")
+            .then(res => res.json())
+            .then(result => {
+                const dropdown = document.getElementById("departmentDropdown12");
+
+                // Kiểm tra DOM có tồn tại không
+                if (!dropdown) {
+                    console.warn("Không tìm thấy phần tử dropdown để load khoa.");
+                    return;
+                }
+
+                dropdown.innerHTML = '<option value="">-- Chọn Khoa --</option>';
+                result.data.forEach(dept => {
+                    const option = document.createElement("option");
+                    option.value = dept.id;
+                    option.textContent = dept.fullName;
+                    dropdown.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error("Lỗi khi tải danh sách khoa:", err);
+            });
+    }
+
+</script>
 <script>
     function showTeacherPanel() {
         hideAllPanels() ;
@@ -739,8 +767,10 @@ async function fetchClassrooms() {
     }
 
     function showCreateTeacherForm() {
+        console.log("🔔 showCreateTeacherForm called");
         document.getElementById('createTeacherForm').style.display = 'block';
-        loadDepartments(); // Gọi khi hiện form
+        // Gọi loadDepartments sau khi DOM hiển thị form
+        loadDepartments1();
     }
 
     function hideCreateTeacherForm() {
@@ -790,23 +820,7 @@ async function fetchClassrooms() {
     });
 
 </script>
-<script>
-    function loadDepartments() {
-        fetch("/admin/department/getAll")
-            .then(res => res.json())
-            .then(result => {
-                const dropdown = document.getElementById("departmentDropdown");
-                dropdown.innerHTML = '<option value="">-- Chọn Khoa --</option>';
-                result.data.forEach(dept => {
-                    const option = document.createElement("option");
-                    option.value = dept.id;
-                    option.textContent = dept.fullName;
-                    dropdown.appendChild(option);
-                });
-            });
-    }
 
-</script>
 <script>
     function showDepartmentPanel() {
         hideAllPanels();
