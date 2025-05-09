@@ -50,4 +50,8 @@ public class ClassRoomServiceImpl implements ClassroomService {
     public List<ClassRoom> findClassRoomsBySemesterName(String semesterName) {
         return classRoomRepository.findBySemesterName(semesterName);
     }
+    @Override
+    public List<ClassRoom> findClassRoomsBySemesterIdAndTeacherId(Long semesterId, Long teacherId) {
+        return classRoomRepository.findBySemesterIdAndTeacherId(semesterId, teacherId);
+    }
 }

@@ -11,4 +11,5 @@ public interface ClassroomService {
 
     // 2. Tìm kiếm ClassRoom theo SemesterName
     public List<ClassRoom> findClassRoomsBySemesterName(String semesterName);
+    public List<ClassRoom> findClassRoomsBySemesterIdAndTeacherId(Long semesterId, Long teacherId);
 }
