@@ -24,4 +24,7 @@ public interface ClassRoomRepository extends JpaRepository<ClassRoom, Long> {
     List<ClassRoom> findBySemesterName(@Param("semesterName") String semesterName);
     @Query("SELECT cr FROM ClassRoom cr WHERE cr.semester.id = :semesterId AND cr.teacher.id = :teacherId")
     List<ClassRoom> findBySemesterIdAndTeacherId(@Param("semesterId") Long semesterId, @Param("teacherId") Long teacherId);
+
+    // Tính số lớp giáo viên đã dạy trong 1 kì
+    int countBySemesterIdAndTeacherId(Long semesterId, Long teacherId);
 }

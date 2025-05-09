@@ -33,6 +33,5 @@ public class DepartmentController {
         List<Department> departments = departmentService.getAllDepartments();
         apiResponse.setData(departments);
         return apiResponse;
-
     }
 }

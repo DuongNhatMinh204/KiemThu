@@ -29,8 +29,9 @@
     <ul class="nav flex-column">
         <li class="nav-item"><a class="nav-link" href="#" onclick="showSubjectPanel()">Quản lý môn học</a></li>
         <li class="nav-item"><a class="nav-link" href="#" onclick="showClassroomPanel()">Quản lý lớp học phần</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Quản lý phân công</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Theo dõi giờ dạy</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" onclick="showTeacherPanel()">Quản lý giảng viên</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" onclick="showDepartmentPanel()">Quản Lý Khoa</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" onclick="showTeachingStatsPanel()">Theo dõi giờ dạy</a></li>
         <li class="nav-item"><a class="nav-link" href="#">Xem kỳ học</a></li>
     </ul>
 </div>
@@ -347,6 +348,137 @@
     </div>
 </div>
 
+<!-- Modal Quản Lý Giảng Viên -->
+<div id="teacherPanel" style="display: none;flex-grow: 1;padding: 30px;overflow-y: auto;width: 100%">
+    <h3>Danh Sách Giảng Viên</h3>
+    <button class="btn btn-primary mb-3" onclick="showCreateTeacherForm()">➕ Thêm Mới Giảng Viên</button>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Họ Tên</th>
+            <th>Ngày Sinh</th>
+            <th>Điện Thoại</th>
+            <th>Email</th>
+            <th>Học Vị</th>
+            <th>Khoa</th>
+        </tr>
+        </thead>
+        <tbody id="teacherTableBody"></tbody>
+    </table>
+</div>
+
+<!-- Form thêm mới -->
+<div id="createTeacherForm" style="display: none;flex-grow: 1;padding: 30px;overflow-y: auto;width: 50%">
+    <h4>Thêm Mới Giảng Viên</h4>
+    <form id="teacherForm">
+        <input type="text" class="form-control mb-2" placeholder="Họ tên" name="fullName" required>
+        <input type="text" class="form-control mb-2" placeholder="Ngày sinh (dd-MM-yyyy)" name="birthday" required>
+        <input type="email" class="form-control mb-2" placeholder="Email" name="email" required>
+        <input type="text" class="form-control mb-2" placeholder="Số điện thoại" name="phone" required>
+        <select class="form-control mb-2" name="degree" required>
+            <option value="">-- Chọn học vị --</option>
+            <option value="THAC_SI">Thạc Sĩ</option>
+            <option value="TIEN_SI">Tiến Sĩ</option>
+            <option value="GIAO_SU">Giáo Sư</option>
+            <option value="PHO_GIAO_SU">Phó Giáo Sư</option>
+        </select>
+
+        <select class="form-control mb-2" name="departmentId" id="departmentDropdown" required>
+            <option value="">-- Chọn Khoa --</option>
+        </select>
+        <button type="submit" class="btn btn-success">Lưu</button>
+        <button type="button" class="btn btn-secondary" onclick="hideCreateTeacherForm()">Hủy</button>
+    </form>
+</div>
+
+<!-- Modal Quản Lý Khoa -->
+<div id="departmentPanel" style="display: none;flex-grow: 1;padding: 30px;overflow-y: auto;width: 100%">
+    <h3>Quản Lý Khoa</h3>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createDepartmentModal">
+        ➕ Thêm Khoa
+    </button>
+
+    <table class="table table-bordered mt-3" id="departmentTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên Khoa</th>
+            <th>Viết Tắt</th>
+            <th>Mô Tả</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Dữ liệu khoa sẽ được thêm bằng JS -->
+        </tbody>
+    </table>
+</div>
+<!-- Modal Thêm Khoa -->
+<div class="modal fade" id="createDepartmentModal" tabindex="-1" aria-labelledby="createDepartmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="createDepartmentForm" onsubmit="createDepartment(event)">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createDepartmentModalLabel">Thêm Khoa Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control mb-2" placeholder="Tên Khoa" id="fullName" required>
+                    <input type="text" class="form-control mb-2" placeholder="Tên Viết Tắt" id="shortName" required>
+                    <input type="text" class="form-control mb-2" placeholder="Mô Tả" id="description">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Giao DIện thống kê -->
+<!-- Panel Theo Dõi Giờ Dạy -->
+<div id="teachingStatsPanel" style="display: none;flex-grow: 1;padding: 30px;overflow-y: auto;width: 100%">
+    <h3>Theo Dõi Giờ Dạy</h3>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label>Kỳ Học</label>
+            <select id="semesterSelect1" class="form-select" onchange="loadDepartmentsForTracking()">
+                <option value="">-- Chọn kỳ học --</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label>Khoa</label>
+            <select id="departmentSelect1" class="form-select" onchange="loadTeachersForTracking()">
+                <option value="">-- Chọn khoa --</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label>Giảng Viên</label>
+            <select id="teacherSelect1" class="form-select">
+                <option value="">-- Chọn giảng viên --</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="btn btn-primary mb-3" onclick="searchTeachingStats()">Tìm kiếm</button>
+
+    <table class="table table-bordered" id="teachingStatsTable" style="display:none">
+        <thead>
+        <tr>
+            <th>Họ Tên</th>
+            <th>Email</th>
+            <th>SĐT</th>
+            <th>Học Vị</th>
+            <th>Số Tiết</th>
+            <th>Số Lớp</th>
+            <th>Tiền Dạy</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
 
 <script>async function showClassroomPanel() {
     hideAllPanels(); // Ẩn tất cả các panel
@@ -581,13 +713,249 @@ async function fetchClassrooms() {
         }
     });
 </script>
->
+
+<script>
+    function showTeacherPanel() {
+        hideAllPanels() ;
+        document.getElementById('teacherPanel').style.display = 'block';
+        document.getElementById('createTeacherForm').style.display = 'none';
+        fetch("/admin/teacher/get-all")
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('teacherTableBody');
+                tbody.innerHTML = '';
+                data.data.forEach(t => {
+                    const row = `<tr>
+                    <td>${t.fullName}</td>
+                    <td>${t.birthday}</td>
+                    <td>${t.phone}</td>
+                    <td>${t.email}</td>
+                    <td>${t.degree}</td>
+                    <td>${t.department.fullName}</td>
+                </tr>`;
+                    tbody.innerHTML += row;
+                });
+            });
+    }
+
+    function showCreateTeacherForm() {
+        document.getElementById('createTeacherForm').style.display = 'block';
+        loadDepartments(); // Gọi khi hiện form
+    }
+
+    function hideCreateTeacherForm() {
+        document.getElementById('createTeacherForm').style.display = 'none';
+    }
+
+    function isValidDateFormat(dateString) {
+        const regex = /^\d{2}-\d{2}-\d{4}$/;
+        if (!regex.test(dateString)) return false;
+
+        const [day, month, year] = dateString.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
+
+        return (
+            date.getFullYear() === year &&
+            date.getMonth() === month - 1 &&
+            date.getDate() === day
+        );
+    }
+
+    document.getElementById("teacherForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        // Kiểm tra ngày sinh hợp lệ
+        if (!isValidDateFormat(data.birthday)) {
+            alert("Ngày sinh không đúng định dạng hoặc không hợp lệ (định dạng đúng: dd-MM-yyyy, ví dụ: 27-12-2004)");
+            return;
+        }
+
+        fetch("/admin/teacher/create", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        })
+            .then(res => res.json())
+            .then(result => {
+                if(result.code === 1000){
+                    alert("Thêm giảng viên thành công!");
+                    hideCreateTeacherForm();
+                    showTeacherPanel();
+                }else {
+                    alert("Lỗi : " + result.message) ;
+                }
+            });
+    });
+
+</script>
+<script>
+    function loadDepartments() {
+        fetch("/admin/department/getAll")
+            .then(res => res.json())
+            .then(result => {
+                const dropdown = document.getElementById("departmentDropdown");
+                dropdown.innerHTML = '<option value="">-- Chọn Khoa --</option>';
+                result.data.forEach(dept => {
+                    const option = document.createElement("option");
+                    option.value = dept.id;
+                    option.textContent = dept.fullName;
+                    dropdown.appendChild(option);
+                });
+            });
+    }
+
+</script>
+<script>
+    function showDepartmentPanel() {
+        hideAllPanels();
+        document.getElementById("departmentPanel").style.display = "block";
+        loadDepartments();
+    }
+
+    function loadDepartments() {
+        fetch("/admin/department/getAll")
+            .then(res => res.json())
+            .then(result => {
+                const tbody = document.querySelector("#departmentTable tbody");
+                tbody.innerHTML = "";
+                result.data.forEach(dept => {
+                    const row = `<tr>
+                    <td>${dept.id}</td>
+                    <td>${dept.fullName}</td>
+                    <td>${dept.shortName}</td>
+                    <td>${dept.description}</td>
+                </tr>`;
+                    tbody.innerHTML += row;
+                });
+            });
+    }
+
+    function createDepartment(event) {
+        event.preventDefault();
+        const data = {
+            fullName: document.getElementById("fullName").value,
+            shortName: document.getElementById("shortName").value,
+            description: document.getElementById("description").value
+        };
+
+        fetch("/admin/department/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.json())
+            .then(result => {
+                alert(result.message);
+                document.getElementById("createDepartmentForm").reset();
+                loadDepartments();
+
+                // Đóng Modal
+                const modalEl = document.getElementById('createDepartmentModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+            });
+    }
+</script>
+<script>
+    function showTeachingStatsPanel() {
+        hideAllPanels();
+        document.getElementById("teachingStatsPanel").style.display = "block";
+        loadSemesters();
+        loadDepartmentsForTracking();
+    }
+
+    function loadSemesters() {
+        fetch('/admin/semester/get-all')
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById('semesterSelect1');
+                select.innerHTML = '<option value="">-- Chọn kỳ học --</option>';
+                data.data.forEach(s => {
+                    select.innerHTML += `<option value="${s.id}">${s.semesterName} - ${s.schoolYear}</option>`;
+                });
+            });
+    }
+
+    function loadDepartmentsForTracking() {
+        fetch('/admin/department/getAll')
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById('departmentSelect1');
+                select.innerHTML = '<option value="">-- Chọn khoa --</option>';
+                data.data.forEach(d => {
+                    select.innerHTML += `<option value="${d.id}">${d.fullName}</option>`;
+                });
+            });
+    }
+
+    function loadTeachersForTracking() {
+        const departmentId = document.getElementById('departmentSelect1').value;
+        const teacherSelect = document.getElementById('teacherSelect1');
+
+        if (!departmentId) {
+            teacherSelect.innerHTML = '<option value="">-- Chọn giảng viên --</option>';
+            return;
+        }
+
+        fetch(`/admin/teacher/get-all-of-department/${departmentId}`)
+            .then(res => res.json())
+            .then(data => {
+                teacherSelect.innerHTML = '<option value="">-- Chọn giảng viên --</option>';
+                data.data.forEach(t => {
+                    teacherSelect.innerHTML += `<option value="${t.id}">${t.fullName}</option>`;
+                });
+            });
+    }
+
+    function searchTeachingStats() {
+        const semesterId = document.getElementById('semesterSelect1').value;
+        const departmentId = document.getElementById('departmentSelect1').value;
+        const teacherId = document.getElementById('teacherSelect1').value;
+
+        if (!semesterId || !departmentId || !teacherId) {
+            alert("Vui lòng chọn đầy đủ thông tin.");
+            return;
+        }
+
+        fetch(`/admin/teacher/getList?semesterId=${semesterId}&departmentId=${departmentId}&teacherId=${teacherId}`)
+            .then(res => res.json())
+            .then(data => {
+                const table = document.getElementById('teachingStatsTable');
+                const tbody = table.querySelector("tbody");
+                const t = data.data;
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td>${t.fullName}</td>
+                        <td>${t.email}</td>
+                        <td>${t.phoneNumber}</td>
+                        <td>${t.degree}</td>
+                        <td>${t.numberOfLessons}</td>
+                        <td>${t.numberOfClass}</td>
+                        <td>${t.total_money.toFixed(2)}</td>
+                    </tr>
+                `;
+
+                table.style.display = "table";
+            });
+    }
+</script>
+
 <script>
     function hideAllPanels() {
         document.getElementById('subjectPanel').style.display = 'none';
         document.getElementById('classroomPanel').style.display = 'none';
+        document.getElementById('teacherPanel').style.display='none' ;
+        document.getElementById('departmentPanel').style.display='none';
+        document.getElementById('teachingStatsPanel').style.display='none';
         // Thêm các panel khác nếu cần
     }
 </script>
+
+
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

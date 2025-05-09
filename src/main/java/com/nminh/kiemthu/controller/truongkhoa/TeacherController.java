@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
-@RequestMapping("admin/teacher")
+@RequestMapping("/admin/teacher")
 public class TeacherController {
     @Autowired
     private TeacherService teacherService;
@@ -36,12 +36,34 @@ public class TeacherController {
         return apiResponse;
     }
 
-    @GetMapping("get-all-of-department/{id}")
+    @GetMapping("/get-all-of-department/{id}")
     public ApiResponse getAllOfDepartment(@PathVariable Long id){
         log.info("getAllOfDepartment ");
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setData(teacherService.getAllTeachersOfDepartment(id));
         log.info("getAllOfDepartment ");
+        return apiResponse;
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ApiResponse deleteTeacherAccount(@PathVariable Long id){
+        log.info("deleteTeacherAccount ");
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setData(teacherService.deleteTeacherAccount(id));
+        log.info("deleteTeacherAccount ");
+        return apiResponse;
+    }
+
+    //Thống kê tổng số tiết giảng , số lớp đã dạy , tiền dạy của từng giảng viên theo từng kỳ
+    @GetMapping("/getList")
+    public ApiResponse getListOfTeacherAccount(@RequestParam Long semesterId ,
+                                               @RequestParam Long departmentId ,
+                                               @RequestParam Long teacherId ){
+        log.info("getListOfTeacherAccount ");
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setData(teacherService.getInfoTeacher(semesterId,departmentId,teacherId));
+        apiResponse.setMessage("Success ");
+        log.info("getListOfTeacherAccount ");
         return apiResponse;
     }
 }
