@@ -57,4 +57,12 @@ public class SubjectServiceImpl implements SubjectService {
         subject.setDepartment(department);
         return subjectRepository.save(subject);
     }
+
+    @Override
+    public String delete(Long id) {
+        Subject subject = subjectRepository.findById(id)
+                .orElseThrow(()->new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+        subjectRepository.delete(subject);
+        return "Subject deleted";
+    }
 }

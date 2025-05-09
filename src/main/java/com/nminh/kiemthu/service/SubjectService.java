@@ -9,4 +9,5 @@ public interface SubjectService {
     Subject createSubject(SubjectCreateDTO subjectCreateDTO);
     List<Subject> getSubjectsInDepartment(Long departmentId);
     Subject change(Long id ,SubjectCreateDTO subjectChangeDTO);
+    String delete(Long id);
 }

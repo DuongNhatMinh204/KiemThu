@@ -51,4 +51,13 @@ public class SubjectController {
         log.info("Subject changed: {}", subject);
         return apiResponse;
     }
+    @DeleteMapping("delete/{id}")
+    public ApiResponse delete(@PathVariable Long id) {
+        log.info("Delete subject: {}", id);
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setData(subjectService.delete(id));
+        apiResponse.setMessage("Subject deleted");
+        log.info("Subject deleted: {}", id);
+        return apiResponse;
+    }
 }
