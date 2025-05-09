@@ -10,4 +10,9 @@ public interface ClassroomService {
     List<ClassRoom> getListClassrooms(Long departmentId , Long semesterId);
     String deleteClassroom(Long classroomId);
     ClassRoom changeClassRoom(Long id , ClassRoomCreateDTO classRoomChangeDTO);
+    public List<ClassRoom> findClassRoomsBySemesterId(Long semesterId);
+
+    // 2. Tìm kiếm ClassRoom theo SemesterName
+    public List<ClassRoom> findClassRoomsBySemesterName(String semesterName);
+    public List<ClassRoom> findClassRoomsBySemesterIdAndTeacherId(Long semesterId, Long teacherId);
 }

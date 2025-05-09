@@ -16,4 +16,12 @@ public interface ClassRoomRepository extends JpaRepository<ClassRoom, Long> {
     @Query("SELECT c FROM ClassRoom c " +
             "WHERE c.semester.id = :semesterId AND c.subject.department.id = :departmentId")
     List<ClassRoom> findByDepartmentAndSemester(@Param("departmentId") Long departmentId, @Param("semesterId") Long semesterId);
+    // Tìm ClassRoom theo semesterId
+    List<ClassRoom> findBySemesterId(Long semesterId);
+
+    // Tìm ClassRoom theo semesterName
+    @Query("SELECT cr FROM ClassRoom cr WHERE cr.semester.semesterName = :semesterName")
+    List<ClassRoom> findBySemesterName(@Param("semesterName") String semesterName);
+    @Query("SELECT cr FROM ClassRoom cr WHERE cr.semester.id = :semesterId AND cr.teacher.id = :teacherId")
+    List<ClassRoom> findBySemesterIdAndTeacherId(@Param("semesterId") Long semesterId, @Param("teacherId") Long teacherId);
 }
