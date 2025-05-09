@@ -14,7 +14,7 @@ public class DataInitializer {
             if (!userRepo.existsByUsername("truongkhoa")) {
                 User u = new User();
                 u.setUsername("truongkhoa");
-                u.setPassword("123456");  // mã hóa mật khẩu
+                u.setPassword("123456");
                 u.setRoleName("truongkhoa");
                 userRepo.save(u);
             }

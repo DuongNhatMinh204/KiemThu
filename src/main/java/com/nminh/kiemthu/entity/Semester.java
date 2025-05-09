@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Semester {
+    public class Semester {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id ;

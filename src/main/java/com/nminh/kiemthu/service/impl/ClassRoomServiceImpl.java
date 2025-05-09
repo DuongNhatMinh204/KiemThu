@@ -15,6 +15,8 @@ import com.nminh.kiemthu.service.ClassroomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ClassRoomServiceImpl implements ClassroomService {
 
@@ -39,5 +41,13 @@ public class ClassRoomServiceImpl implements ClassroomService {
         ClassRoom classRoom = new ClassRoom(classRoomCreateDTO.getClassName(),classRoomCreateDTO.getNumberOfStudents(), semester, subject, teacher);
 
         return classRoomRepository.save(classRoom);
+    }
+    @Override
+    public List<ClassRoom> findClassRoomsBySemesterId(Long semesterId) {
+        return classRoomRepository.findBySemesterId(semesterId);
+    }
+    @Override
+    public List<ClassRoom> findClassRoomsBySemesterName(String semesterName) {
+        return classRoomRepository.findBySemesterName(semesterName);
     }
 }
