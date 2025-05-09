@@ -274,6 +274,7 @@
             <th>Môn học</th>
             <th>Giảng viên</th>
             <th>Kỳ học</th>
+            <th>Hành động</th>
         </tr>
         </thead>
         <tbody></tbody>
@@ -316,6 +317,36 @@
         </div>
     </div>
 </div>
+<!-- Modal Cập Nhật Lớp Học -->
+<div class="modal fade" id="editClassroomModal" tabindex="-1" aria-labelledby="editClassroomModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cập Nhật Lớp Học</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editClassroomForm">
+                    <input type="hidden" id="editClassroomId">
+                    <div class="mb-3">
+                        <label for="editClassName" class="form-label">Tên lớp</label>
+                        <input type="text" class="form-control" id="editClassName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editNumberOfStudents" class="form-label">Số sinh viên</label>
+                        <input type="number" class="form-control" id="editNumberOfStudents" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTeacherSelect" class="form-label">Giảng viên</label>
+                        <select class="form-select" id="editTeacherSelect" required></select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>async function showClassroomPanel() {
     hideAllPanels(); // Ẩn tất cả các panel
@@ -363,17 +394,22 @@ async function fetchClassrooms() {
     data.data.forEach((cls, index) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${cls.className}</td>
-            <td>${cls.numberOfStudents}</td>
-            <td>${cls.classCoefficient}</td>
-            <td>${cls.subject.subjectName}</td>
-            <td>${cls.teacher.fullName}</td>
-            <td>${cls.semester.semesterName} (${cls.semester.schoolYear})</td>
-        `;
+        <td>${index + 1}</td>
+        <td>${cls.className}</td>
+        <td>${cls.numberOfStudents}</td>
+        <td>${cls.classCoefficient}</td>
+        <td>${cls.subject.subjectName}</td>
+        <td>${cls.teacher.fullName}</td>
+        <td>${cls.semester.semesterName} (${cls.semester.schoolYear})</td>
+        <td>
+            <button class="btn btn-danger btn-sm" onclick="deleteClassroom(${cls.id})">🗑️ Xóa</button>
+             <button class="btn btn-warning btn-sm" onclick='editClassroom(${JSON.stringify(cls)})'>✏️ Sửa</button>
+        </td>
+    `;
         tbody.appendChild(row);
     });
 }
+
 </script>
 <script>
     document.getElementById('addClassroomBtn').addEventListener('click', async () => {
@@ -455,6 +491,97 @@ async function fetchClassrooms() {
     });
 
 </script>
+<script>
+    async function deleteClassroom(id) {
+        if (!confirm("Bạn có chắc chắn muốn xóa lớp học này?")) return;
+
+        try {
+            const res = await fetch(`/admin/classroom/delete/${id}`, {
+                method: 'DELETE'
+            });
+
+            const result = await res.json();
+            if (result.code === 1000) {
+                alert("Xóa lớp học thành công!");
+                fetchClassrooms(); // Cập nhật danh sách
+            } else {
+                alert("Lỗi: " + (result.message || "Không rõ lỗi"));
+            }
+        } catch (error) {
+            alert("Đã xảy ra lỗi khi gửi yêu cầu: " + error.message);
+        }
+    }
+</script>
+<script>
+    let currentClassroom = null; // Biến toàn cục để lưu lớp học hiện tại
+
+    async function editClassroom(cls) {
+        currentClassroom = cls; // Lưu để sử dụng khi submit
+
+        document.getElementById('editClassroomId').value = cls.id;
+        document.getElementById('editClassName').value = cls.className;
+        document.getElementById('editNumberOfStudents').value = cls.numberOfStudents;
+
+        // Tải danh sách giảng viên theo khoa lớp học
+        const departmentId = cls.teacher.department.id;
+        const res = await fetch(`/admin/teacher/get-all-of-department/${departmentId}`);
+        const json = await res.json();
+
+        const teacherSelect = document.getElementById('editTeacherSelect');
+        teacherSelect.innerHTML = '';
+        json.data.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.id;
+            opt.textContent = t.fullName;
+            if (t.id === cls.teacher.id) opt.selected = true;
+            teacherSelect.appendChild(opt);
+        });
+
+        new bootstrap.Modal(document.getElementById('editClassroomModal')).show();
+    }
+
+    document.getElementById('editClassroomForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById('editClassroomId').value;
+        const className = document.getElementById('editClassName').value;
+        const numberOfStudents = parseInt(document.getElementById('editNumberOfStudents').value);
+        const teacherId = parseInt(document.getElementById('editTeacherSelect').value);
+
+        if (!currentClassroom) {
+            alert("Không tìm thấy thông tin lớp học hiện tại.");
+            return;
+        }
+
+        const subjectId = currentClassroom.subject.id;
+        const semesterId = currentClassroom.semester.id;
+
+        const payload = {
+            className,
+            numberOfStudents,
+            teacherId,
+            subjectId,
+            semesterId
+        };
+
+        const res = await fetch(`/admin/classroom/change/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+
+        if (result.code === 1000) {
+            alert("✅ Cập nhật lớp học thành công!");
+            bootstrap.Modal.getInstance(document.getElementById('editClassroomModal')).hide();
+            fetchClassrooms();
+        } else {
+            alert("❌ Lỗi khi cập nhật lớp học: " + (result.message || 'Không rõ lỗi.'));
+        }
+    });
+</script>
+>
 <script>
     function hideAllPanels() {
         document.getElementById('subjectPanel').style.display = 'none';

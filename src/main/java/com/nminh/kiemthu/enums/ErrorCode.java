@@ -15,6 +15,7 @@ public enum ErrorCode {
     SUBJECT_NOT_FOUND(1008,"subject not found" , HttpStatus.BAD_REQUEST),
     TEACHER_NOT_FOUND(1009,"teacher not found" , HttpStatus.BAD_REQUEST),
     NOT_EXISTS_SUBJECT_IN_THIS_SEMESTER_OF_DEPARTMENT(1010,"not exists subject in this " , HttpStatus.BAD_REQUEST),
+    CLASS_NOT_FOUND(1011,"class not found" , HttpStatus.BAD_REQUEST),
     ;
 
     private int code ;

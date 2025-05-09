@@ -37,6 +37,23 @@ public class ClassRoomController {
         response.setData(res);
         response.setMessage("ClassRoom viewed");
         return response;
-
     }
+
+   @DeleteMapping("/delete/{id}")
+    public ApiResponse deleteClassRoom(@PathVariable Long id) {
+        log.info("ClassRoomController.deleteClassRoom");
+        ApiResponse response = new ApiResponse();
+        response.setData(classroomService.deleteClassroom(id));
+        response.setMessage("ClassRoom deleted");
+        return response;
+   }
+
+   @PutMapping("/change/{id}")
+   public ApiResponse changeClassRoom(@PathVariable Long id , @RequestBody ClassRoomCreateDTO classRoomChangeDTO) {
+        log.info("ClassRoomController.changeClassRoom");
+        ApiResponse response = new ApiResponse();
+        response.setData(classroomService.changeClassRoom(id, classRoomChangeDTO));
+        response.setMessage("ClassRoom changed");
+        return response;
+   }
 }

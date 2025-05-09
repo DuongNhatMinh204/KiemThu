@@ -1,5 +1,6 @@
 package com.nminh.kiemthu.service.impl;
 
+import com.nminh.kiemthu.constants.Constant;
 import com.nminh.kiemthu.entity.*;
 import com.nminh.kiemthu.enums.ErrorCode;
 import com.nminh.kiemthu.exception.AppException;
@@ -51,4 +52,45 @@ public class ClassRoomServiceImpl implements ClassroomService {
         }
         return res;
     }
+
+    @Override
+    public String deleteClassroom(Long classroomId) {
+        ClassRoom classRoom = classRoomRepository.findById(classroomId)
+                .orElseThrow(()->new AppException(ErrorCode.CLASS_NOT_FOUND)) ;
+        classRoomRepository.delete(classRoom);
+        return "Classroom deleted";
+    }
+
+    @Override
+    public ClassRoom changeClassRoom(Long id, ClassRoomCreateDTO classRoomChangeDTO) {
+        ClassRoom classRoom = classRoomRepository.findById(id)
+                .orElseThrow(()-> new AppException(ErrorCode.CLASS_NOT_FOUND));
+        Teacher teacher = teacherRepository.findById(classRoomChangeDTO.getTeacherId())
+                        .orElseThrow(()-> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+        classRoom.setClassName(classRoomChangeDTO.getClassName());
+        classRoom.setNumberOfStudents(classRoomChangeDTO.getNumberOfStudents());
+        classRoom.setTeacher(teacher);
+        int numberOfStudents = classRoomChangeDTO.getNumberOfStudents();
+        Double coe ;
+        if(numberOfStudents>0 && numberOfStudents < 20) {
+             coe = Constant.NUMBER_STUDENT_LESS_THAN_TWENTY ;
+        } else if(numberOfStudents>= 20 && numberOfStudents <= 29) {
+            coe = Constant.NUMBER_STUDENT_LESS_THAN_TWENTY_NINE ;
+        }else if(numberOfStudents>= 30 && numberOfStudents <= 39) {
+            coe = Constant.NUMBER_STUDENT_LESS_THAN_THIRTY_NINE;
+        } else if (numberOfStudents >= 40 && numberOfStudents <= 49) {
+            coe = Constant.NUMBER_STUDENT_LESS_THAN_FOURTY_NINE;
+        }else if (numberOfStudents >= 50 && numberOfStudents <= 59) {
+            coe = Constant.NUMBER_STUDENT_LESS_THAN_FIFTY_NINE;
+        }else if (numberOfStudents >= 60 && numberOfStudents <= 69) {
+            coe = Constant.NUMBER_STUDENT_LESS_THAN_SIXTY_NINE ;
+        }else if (numberOfStudents >= 70 && numberOfStudents <= 79) {
+            coe = Constant.NUMBER_STUDENT_LESS_THAN_SEVENTIES_NINE ;
+        }else {
+            coe = (double) 0;
+        }
+        classRoom.setClassCoefficient(coe);
+        return classRoomRepository.save(classRoom);
+    }
+
 }

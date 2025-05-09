@@ -8,4 +8,6 @@ import java.util.List;
 public interface ClassroomService {
     ClassRoom createClassroom(ClassRoomCreateDTO classRoomCreateDTO);
     List<ClassRoom> getListClassrooms(Long departmentId , Long semesterId);
+    String deleteClassroom(Long classroomId);
+    ClassRoom changeClassRoom(Long id , ClassRoomCreateDTO classRoomChangeDTO);
 }
