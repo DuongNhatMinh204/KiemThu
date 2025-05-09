@@ -7,6 +7,8 @@ import com.nminh.kiemthu.service.SemesterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class SemesterServiceImpl implements SemesterService {
 
@@ -23,5 +25,10 @@ public class SemesterServiceImpl implements SemesterService {
         semester.setTimeEnd(semesterCreateDTO.getTimeEnd());
 
         return semesterRepository.save(semester);
+    }
+
+    @Override
+    public List<Semester> getAllSemesters() {
+        return semesterRepository.findAll();
     }
 }

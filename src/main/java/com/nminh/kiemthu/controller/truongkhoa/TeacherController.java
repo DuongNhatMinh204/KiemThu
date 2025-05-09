@@ -7,10 +7,7 @@ import com.nminh.kiemthu.service.TeacherService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -27,6 +24,24 @@ public class TeacherController {
         apiResponse.setData(teacher);
 
         log.info("created TeacherAccount ");
+        return apiResponse;
+    }
+
+    @GetMapping("/get-all")
+    public ApiResponse getAllTeacherAccount(){
+        log.info("getAllTeacherAccount ");
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setData(teacherService.getAllTeachers());
+        log.info("getAllTeacherAccount ");
+        return apiResponse;
+    }
+
+    @GetMapping("get-all-of-department/{id}")
+    public ApiResponse getAllOfDepartment(@PathVariable Long id){
+        log.info("getAllOfDepartment ");
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setData(teacherService.getAllTeachersOfDepartment(id));
+        log.info("getAllOfDepartment ");
         return apiResponse;
     }
 }

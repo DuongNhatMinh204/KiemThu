@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @Slf4j
-@RequestMapping("admin/subject")
+@RequestMapping("/admin/subject")
 public class SubjectController {
     @Autowired
     private SubjectService subjectService;

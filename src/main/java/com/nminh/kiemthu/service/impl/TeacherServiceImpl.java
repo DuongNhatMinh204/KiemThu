@@ -11,6 +11,8 @@ import com.nminh.kiemthu.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TeacherServiceImpl implements TeacherService {
 
@@ -38,6 +40,19 @@ public class TeacherServiceImpl implements TeacherService {
         teacher.setDepartment(department);
 
         return teacherRepository.save(teacher);
+
+    }
+
+    @Override
+    public List<Teacher> getAllTeachers() {
+        return teacherRepository.findAll();
+    }
+
+    @Override
+    public List<Teacher> getAllTeachersOfDepartment(Long departmentId) {
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(()->new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
+        return teacherRepository.findByDepartment(department);
 
     }
 }
