@@ -48,7 +48,7 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
     private TeacherSalaryResponse mapToTeacherSalaryResponse(TeacherSalary teacherSalary, List<ClassRoom> classRooms) {
         TeacherSalaryResponse response = new TeacherSalaryResponse();
         response.setTeacherRespose(mapToTeacherResponse(teacherSalary.getTeacher()));
-        response.setClassRoom(classRooms);
+//        response.setClassRoom(classRooms.forEach(classRoom -> classRoom.getClassName()));
         response.setTotalHoursTeaching(teacherSalary.getTotalHoursTeaching());
         response.setTotalSalary(teacherSalary.getTotalSalary());
         response.setStatusPayment(teacherSalary.getStatusPayment());
