@@ -27,6 +27,7 @@
 <div class="sidebar">
     <h5>🌟 Trưởng Khoa</h5>
     <ul class="nav flex-column">
+        <li class="nav-item"><a class="nav-link" onclick="showDegreePanel()" href="#" >Quản lý bằng cấp</a></li>
         <li class="nav-item"><a class="nav-link" href="#" onclick="showSubjectPanel()">Quản lý môn học</a></li>
         <li class="nav-item"><a class="nav-link" href="#" onclick="showClassroomPanel()">Quản lý lớp học phần</a></li>
         <li class="nav-item"><a class="nav-link" href="#" onclick="showTeacherPanel()">Quản lý giảng viên</a></li>
@@ -35,6 +36,40 @@
         <li class="nav-item"><a class="nav-link" href="#">Xem kỳ học</a></li>
     </ul>
 </div>
+
+<!-- Quản Lý Bằng Cấp -->
+<div id="degreePanel" style="display:none; flex-grow:1; padding:30px; overflow-y:auto; width:100%">
+    <h4>🎓 Quản Lý Bằng Cấp</h4>
+    <button class="btn btn-success mb-3" onclick="showAddDegreeForm()">➕ Thêm Bằng Cấp</button>
+    <table class="table table-bordered" id="degreeTable">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Tên viết tắt</th>
+            <th>Tên đầy đủ</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- Form Thêm / Sửa Bằng Cấp -->
+<div id="degreeFormPanel" style="display:none; flex-grow:1; padding:30px; overflow-y:auto; width:50%">
+    <h5 id="degreeFormTitle">Thêm Bằng Cấp</h5>
+    <div class="mb-3">
+        <label class="form-label">Tên viết tắt</label>
+        <input type="text" class="form-control" id="degreeShortName">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Tên đầy đủ</label>
+        <input type="text" class="form-control" id="degreeFullName">
+    </div>
+    <input type="hidden" id="degreeId">
+    <button class="btn btn-primary" onclick="submitDegree()">Lưu</button>
+    <button class="btn btn-secondary" onclick="hideDegreeForm()">Hủy</button>
+</div>
+
 
 <!-- Main Content -->
 <div class="content">
@@ -348,7 +383,7 @@
     </div>
 </div>
 
-<!-- Modal Quản Lý Giảng Viên -->
+<!-- Bảng Danh Sách Giảng Viên -->
 <div id="teacherPanel" style="display: none;flex-grow: 1;padding: 30px;overflow-y: auto;width: 100%">
     <h3>Danh Sách Giảng Viên</h3>
     <button class="btn btn-primary mb-3" onclick="showCreateTeacherForm()">➕ Thêm Mới Giảng Viên</button>
@@ -361,35 +396,33 @@
             <th>Email</th>
             <th>Học Vị</th>
             <th>Khoa</th>
+            <th>Hành Động</th>
         </tr>
         </thead>
         <tbody id="teacherTableBody"></tbody>
     </table>
 </div>
 
-<!-- Form thêm mới -->
+<!-- Form Thêm / Sửa Giảng Viên -->
 <div id="createTeacherForm" style="display: none;flex-grow: 1;padding: 30px;overflow-y: auto;width: 50%">
-    <h4>Thêm Mới Giảng Viên</h4>
+    <h4 id="teacherFormTitle">Thêm Mới Giảng Viên</h4>
     <form id="teacherForm">
+        <input type="hidden" name="id" id="teacherId">
         <input type="text" class="form-control mb-2" placeholder="Họ tên" name="fullName" required>
         <input type="text" class="form-control mb-2" placeholder="Ngày sinh (dd-MM-yyyy)" name="birthday" required>
         <input type="email" class="form-control mb-2" placeholder="Email" name="email" required>
         <input type="text" class="form-control mb-2" placeholder="Số điện thoại" name="phone" required>
-        <select class="form-control mb-2" name="degree" required>
+        <select class="form-control mb-2" name="degreeId" id="degreeDropdown" required>
             <option value="">-- Chọn học vị --</option>
-            <option value="THAC_SI">Thạc Sĩ</option>
-            <option value="TIEN_SI">Tiến Sĩ</option>
-            <option value="GIAO_SU">Giáo Sư</option>
-            <option value="PHO_GIAO_SU">Phó Giáo Sư</option>
         </select>
-
-        <select class="form-control mb-2" name="departmentId" id="departmentDropdown12" required>
+        <select class="form-control mb-2" name="departmentId" id="departmentDropdown" required>
             <option value="">-- Chọn Khoa --</option>
         </select>
         <button type="submit" class="btn btn-success">Lưu</button>
         <button type="button" class="btn btn-secondary" onclick="hideCreateTeacherForm()">Hủy</button>
     </form>
 </div>
+
 
 <!-- Modal Quản Lý Khoa -->
 <div id="departmentPanel" style="display: none;flex-grow: 1;padding: 30px;overflow-y: auto;width: 100%">
@@ -742,93 +775,16 @@ async function fetchClassrooms() {
     }
 
 </script>
-<script>
-    function showTeacherPanel() {
-        hideAllPanels() ;
-        document.getElementById('teacherPanel').style.display = 'block';
-        document.getElementById('createTeacherForm').style.display = 'none';
-        fetch("/admin/teacher/get-all")
-            .then(response => response.json())
-            .then(data => {
-                const tbody = document.getElementById('teacherTableBody');
-                tbody.innerHTML = '';
-                data.data.forEach(t => {
-                    const row = `<tr>
-                    <td>${t.fullName}</td>
-                    <td>${t.birthday}</td>
-                    <td>${t.phone}</td>
-                    <td>${t.email}</td>
-                    <td>${t.degree}</td>
-                    <td>${t.department.fullName}</td>
-                </tr>`;
-                    tbody.innerHTML += row;
-                });
-            });
-    }
 
-    function showCreateTeacherForm() {
-        console.log("🔔 showCreateTeacherForm called");
-        document.getElementById('createTeacherForm').style.display = 'block';
-        // Gọi loadDepartments sau khi DOM hiển thị form
-        loadDepartments1();
-    }
-
-    function hideCreateTeacherForm() {
-        document.getElementById('createTeacherForm').style.display = 'none';
-    }
-
-    function isValidDateFormat(dateString) {
-        const regex = /^\d{2}-\d{2}-\d{4}$/;
-        if (!regex.test(dateString)) return false;
-
-        const [day, month, year] = dateString.split('-').map(Number);
-        const date = new Date(year, month - 1, day);
-
-        return (
-            date.getFullYear() === year &&
-            date.getMonth() === month - 1 &&
-            date.getDate() === day
-        );
-    }
-
-    document.getElementById("teacherForm").addEventListener("submit", function(e) {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-
-        // Kiểm tra ngày sinh hợp lệ
-        if (!isValidDateFormat(data.birthday)) {
-            alert("Ngày sinh không đúng định dạng hoặc không hợp lệ (định dạng đúng: dd-MM-yyyy, ví dụ: 27-12-2004)");
-            return;
-        }
-
-        fetch("/admin/teacher/create", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(data)
-        })
-            .then(res => res.json())
-            .then(result => {
-                if(result.code === 1000){
-                    alert("Thêm giảng viên thành công!");
-                    hideCreateTeacherForm();
-                    showTeacherPanel();
-                }else {
-                    alert("Lỗi : " + result.message) ;
-                }
-            });
-    });
-
-</script>
 
 <script>
     function showDepartmentPanel() {
         hideAllPanels();
         document.getElementById("departmentPanel").style.display = "block";
-        loadDepartments();
+        loadDepartmentsQuanLyKhoa();
     }
 
-    function loadDepartments() {
+    function loadDepartmentsQuanLyKhoa() {
         fetch("/admin/department/getAll")
             .then(res => res.json())
             .then(result => {
@@ -865,7 +821,7 @@ async function fetchClassrooms() {
             .then(result => {
                 alert(result.message);
                 document.getElementById("createDepartmentForm").reset();
-                loadDepartments();
+                loadDepartmentsQuanLyKhoa();
 
                 // Đóng Modal
                 const modalEl = document.getElementById('createDepartmentModal');
@@ -947,7 +903,7 @@ async function fetchClassrooms() {
                         <td>${t.fullName}</td>
                         <td>${t.email}</td>
                         <td>${t.phoneNumber}</td>
-                        <td>${t.degree}</td>
+                        <td>${t.degree.fullName}</td>
                         <td>${t.numberOfLessons}</td>
                         <td>${t.numberOfClass}</td>
                         <td>${t.total_money.toFixed(2)}</td>
@@ -958,14 +914,17 @@ async function fetchClassrooms() {
             });
     }
 </script>
-
+<script src="/js/bangcap.js"></script>
+<script src="/js/loadDegree.js"></script>
+<script src="/js/giaovien.js"></script>
 <script>
-    function hideAllPanels() {
+    function    hideAllPanels() {
         document.getElementById('subjectPanel').style.display = 'none';
         document.getElementById('classroomPanel').style.display = 'none';
         document.getElementById('teacherPanel').style.display='none' ;
         document.getElementById('departmentPanel').style.display='none';
         document.getElementById('teachingStatsPanel').style.display='none';
+        document.getElementById('degreePanel').style.display = 'none' ;
         // Thêm các panel khác nếu cần
     }
 </script>

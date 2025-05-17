@@ -1,7 +1,7 @@
 package com.nminh.kiemthu.model.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.nminh.kiemthu.enums.Degree;
+import com.nminh.kiemthu.entity.Degree;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +29,7 @@ public class TeacherDTO {
     private String phone;
 
     @NotNull(message = "ARGUMENT_NOT_VALID")
-    private Degree degree;
+    private Long  degreeId;
 
     @NotNull(message = "ARGUMENT_NOT_VALID")
     private Long departmentId;

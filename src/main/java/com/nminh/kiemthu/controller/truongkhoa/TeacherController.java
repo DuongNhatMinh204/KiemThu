@@ -54,6 +54,15 @@ public class TeacherController {
         return apiResponse;
     }
 
+    @PutMapping("/update/{id}")
+    public ApiResponse updateTeacherAccount(@PathVariable Long id,@RequestBody TeacherDTO teacherDTO){
+        log.info("updateTeacherAccount ");
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setData(teacherService.updateTeacherAccount(id, teacherDTO));
+        log.info("updateTeacherAccount ");
+        return apiResponse;
+    }
+
     //Thống kê tổng số tiết giảng , số lớp đã dạy , tiền dạy của từng giảng viên theo từng kỳ
     @GetMapping("/getList")
     public ApiResponse getListOfTeacherAccount(@RequestParam Long semesterId ,
@@ -64,6 +73,14 @@ public class TeacherController {
         apiResponse.setData(teacherService.getInfoTeacher(semesterId,departmentId,teacherId));
         apiResponse.setMessage("Success ");
         log.info("getListOfTeacherAccount ");
+        return apiResponse;
+    }
+    @GetMapping("/get/{id}")
+    public ApiResponse getTeacherAccount(@PathVariable Long id){
+        log.info("getTeacherAccount ");
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setData(teacherService.getTeacherById(id));
+        log.info("getTeacherAccount ");
         return apiResponse;
     }
 }

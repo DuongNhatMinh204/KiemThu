@@ -1,6 +1,6 @@
 package com.nminh.kiemthu.model.response;
 
-import com.nminh.kiemthu.enums.Degree;
+import com.nminh.kiemthu.entity.Degree;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

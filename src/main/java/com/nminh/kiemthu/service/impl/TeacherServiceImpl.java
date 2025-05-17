@@ -2,7 +2,6 @@ package com.nminh.kiemthu.service.impl;
 
 import com.nminh.kiemthu.constants.Constant;
 import com.nminh.kiemthu.entity.*;
-import com.nminh.kiemthu.enums.Degree;
 import com.nminh.kiemthu.enums.ErrorCode;
 import com.nminh.kiemthu.exception.AppException;
 import com.nminh.kiemthu.model.request.TeacherDTO;
@@ -32,10 +31,15 @@ public class TeacherServiceImpl implements TeacherService {
     @Autowired
     private ClassRoomRepository classRoomRepository;
 
+    @Autowired
+    private DegreeRepository degreeRepository;
+
     @Override
     public Teacher createTeacherAccount(TeacherDTO teacherDTO) {
         Department department = departmentRepository.findById(teacherDTO.getDepartmentId())
                 .orElseThrow(()->new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
+        Degree degree = degreeRepository.findById(teacherDTO.getDegreeId())
+                .orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTS_DEGREE)) ;
         boolean exist = teacherRepository.existsByPhone(teacherDTO.getPhone()) ;
         if(exist) {
             throw new  AppException(ErrorCode.PHONE_EXISTS) ;
@@ -46,7 +50,7 @@ public class TeacherServiceImpl implements TeacherService {
         teacher.setEmail(teacherDTO.getEmail());
         teacher.setPhone(teacherDTO.getPhone());
         teacher.setBirthday(teacherDTO.getBirthday());
-        teacher.setDegree(teacherDTO.getDegree());
+        teacher.setDegree(degree);
         teacher.setDepartment(department);
         teacherRepository.save(teacher) ;
         // khi tạo giáo viên thì tạo lun tài khoản giáo viên với pass = 123456
@@ -103,13 +107,13 @@ public class TeacherServiceImpl implements TeacherService {
         }
 
         Double heSoGiaoVien ;
-        if(teacher.getDegree().equals(Degree.THAC_SI)){
+        if(teacher.getDegree().getFullName().equals("THAC_SI")){
             heSoGiaoVien = Constant.HE_SO_THAC_SI ;
-        }else if (teacher.getDegree().equals(Degree.TIEN_SI)){
+        }else if (teacher.getDegree().getFullName().equals("TIEN_SI")){
             heSoGiaoVien = Constant.HE_SO_TIEN_SI ;
-        } else if (teacher.getDegree().equals(Degree.PHO_GIAO_SU)) {
+        } else if (teacher.getDegree().getFullName().equals("PHO_GIAO_SU")) {
             heSoGiaoVien = Constant.HE_SO_PHO_GIAO_SU ;
-        } else if (teacher.getDegree().equals(Degree.GIAO_SU)) {
+        } else if (teacher.getDegree().getFullName().equals("GIAO_SU")) {
             heSoGiaoVien = Constant.HE_SO_GIAO_SU ;
         }else {
             heSoGiaoVien = 1.0 ;
@@ -129,5 +133,23 @@ public class TeacherServiceImpl implements TeacherService {
 
         return infoTeacherResponseDTO;
 
+    }
+
+    @Override
+    public Teacher updateTeacherAccount(Long id, TeacherDTO teacherDTO) {
+        Teacher teacher = teacherRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.TEACHER_NOT_FOUND));
+        teacher.setFullName(teacherDTO.getFullName());
+        teacher.setEmail(teacherDTO.getEmail());
+        teacher.setPhone(teacherDTO.getPhone());
+        teacher.setBirthday(teacherDTO.getBirthday());
+        teacher.setDepartment(departmentRepository.findById(teacherDTO.getDepartmentId()).orElseThrow(()->new AppException(ErrorCode.DEPARTMENT_NOT_FOUND)));
+        teacher.setDegree(degreeRepository.findById(teacherDTO.getDegreeId()).orElseThrow(()->new AppException(ErrorCode.DEPARTMENT_NOT_FOUND)));
+
+        return teacherRepository.save(teacher);
+    }
+
+    @Override
+    public Teacher getTeacherById(Long id) {
+        return teacherRepository.findById(id).orElse(null);
     }
 }
