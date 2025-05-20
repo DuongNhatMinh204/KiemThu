@@ -30,7 +30,8 @@ public class SubjectServiceImpl implements SubjectService {
 
         subject.setSubjectName(subjectCreateDTO.getSubjectName());
         subject.setCredits(subjectCreateDTO.getCredits());
-        subject.setModule_coefficient(subjectCreateDTO.getModule_coefficient());
+        subject.setModule_coefficient(subjectCreateDTO.getModule_coefficient()) ;
+        subject.setNumberOfLessons(subjectCreateDTO.getNumberOfLessons());
         subject.setDepartment(department);
 
         return subjectRepository.save(subject);
@@ -54,6 +55,7 @@ public class SubjectServiceImpl implements SubjectService {
         subject.setSubjectName(subjectChangeDTO.getSubjectName());
         subject.setCredits(subjectChangeDTO.getCredits());
         subject.setModule_coefficient(subjectChangeDTO.getModule_coefficient());
+        subject.setNumberOfLessons(subjectChangeDTO.getNumberOfLessons());
         subject.setDepartment(department);
         return subjectRepository.save(subject);
     }

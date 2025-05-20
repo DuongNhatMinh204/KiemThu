@@ -2,7 +2,6 @@ package com.nminh.kiemthu.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -26,7 +25,10 @@ public class Subject {
     private int credits; // số tín chỉ
 
     @Column(name = "module_coefficient" ,nullable = false)
-    private double module_coefficient ;//hệ số học phần
+    private Double module_coefficient;//hệ số học phần
+
+    @Column(name = "number_of_lessons")
+    private Double numberOfLessons;  // số tiết học
 
     @ManyToOne
     @JoinColumn(name = "department_id")

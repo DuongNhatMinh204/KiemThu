@@ -30,5 +30,5 @@ public class Degree {
     private List<Teacher> teacherList ;
 
     @Column(name = "degree_coefficient")
-    private double degreeCoefficient;
+    private Double degreeCoefficient;
 }

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class SubjectCreateDTO {
     private String subjectName;
     private int credits ;
-    private double module_coefficient ;//hệ số học phần
+    private Double module_coefficient ;//hệ số học phần
+    private Double numberOfLessons ; // số tiết
     private Long departmentId ;
 }
