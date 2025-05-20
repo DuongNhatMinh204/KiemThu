@@ -2,7 +2,6 @@ package com.nminh.kiemthu.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.nminh.kiemthu.enums.Degree;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -34,7 +33,8 @@ public class Teacher {
     @Column(name = "email" ,nullable = false)
     private String email;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "degree_id")
     private Degree degree;
 
     @ManyToOne

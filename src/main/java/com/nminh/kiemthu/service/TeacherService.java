@@ -12,4 +12,6 @@ public interface TeacherService {
     List<Teacher> getAllTeachersOfDepartment(Long departmentId);
     String deleteTeacherAccount(Long id);
     InfoTeacherResponseDTO getInfoTeacher(Long semesterId ,Long departmentId,Long teacherId) ;
+    Teacher updateTeacherAccount(Long id,TeacherDTO teacherDTO);
+    Teacher getTeacherById(Long id);
 }
