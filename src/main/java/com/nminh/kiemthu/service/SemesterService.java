@@ -8,4 +8,6 @@ import java.util.List;
 public interface SemesterService {
     Semester createSemester(SemesterCreateDTO semesterCreateDTO);
     List<Semester> getAllSemesters();
+    Semester updateSemester(Long id,SemesterCreateDTO semesterCreateDTO);
+    String deleteSemester(Long id);
 }

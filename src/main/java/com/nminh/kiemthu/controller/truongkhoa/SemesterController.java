@@ -25,6 +25,22 @@ public class SemesterController {
         apiResponse.setMessage("Semester created");
         return apiResponse;
     }
+    @PutMapping("/update/{id}")
+    public ApiResponse updateSemester(@PathVariable Long id ,@RequestBody SemesterCreateDTO semesterCreateDTO) {
+        log.info("updateSemester");
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setData(semesterService.updateSemester(id,semesterCreateDTO));
+        apiResponse.setMessage("Semester updated");
+        return apiResponse;
+    }
+    @DeleteMapping("/delete/{id}")
+    public ApiResponse deleteSemester(@PathVariable Long id) {
+        log.info("deleteSemester");
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setData(semesterService.deleteSemester(id));
+        apiResponse.setMessage("Semester deleted");
+        return apiResponse;
+    }
     @GetMapping("/get-all")
     public ApiResponse getAllSemester() {
         log.info("getAllSemester");

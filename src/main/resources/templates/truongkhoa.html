@@ -33,7 +33,7 @@
         <li class="nav-item"><a class="nav-link" href="#" onclick="showTeacherPanel()">Quản lý giảng viên</a></li>
         <li class="nav-item"><a class="nav-link" href="#" onclick="showDepartmentPanel()">Quản Lý Khoa</a></li>
         <li class="nav-item"><a class="nav-link" href="#" onclick="showTeachingStatsPanel()">Theo dõi giờ dạy</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Xem kỳ học</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" onclick="showSemesterPanel()">Quản Lý kỳ học</a></li>
     </ul>
 </div>
 
@@ -478,6 +478,40 @@
         </div>
     </div>
 </div>
+
+
+<!-- Panel Kỳ Học -->
+<div id="semesterPanel" style="display: none; flex-grow: 1; padding: 30px; overflow-y: auto; width: 100%">
+    <h4>📚 Quản Lý Kỳ Học</h4>
+    <button class="btn btn-primary mb-3" onclick="showSemesterForm()">➕ Thêm Kỳ Học</button>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Tên Kỳ</th>
+            <th>Năm Học</th>
+            <th>Bắt Đầu</th>
+            <th>Kết Thúc</th>
+            <th>Hành Động</th>
+        </tr>
+        </thead>
+        <tbody id="semesterTableBody"></tbody>
+    </table>
+</div>
+
+<!-- Form Thêm / Sửa Kỳ Học -->
+<div id="semesterFormPanel" style="display: none; width: 50%; padding: 30px">
+    <h5 id="semesterFormTitle">Thêm Kỳ Học</h5>
+    <input type="hidden" id="semesterId">
+    <input type="text" class="form-control mb-2" placeholder="Tên Kỳ" id="semesterName">
+    <input type="text" class="form-control mb-2" placeholder="Năm Học (VD: 2024-2025)" id="schoolYear">
+    <input type="text" class="form-control mb-2" placeholder="Ngày Bắt Đầu (dd-MM-yyyy)" id="timeBegin">
+    <input type="text" class="form-control mb-2" placeholder="Ngày Kết Thúc (dd-MM-yyyy)" id="timeEnd">
+    <button class="btn btn-success" onclick="submitSemester()">Lưu</button>
+    <button class="btn btn-secondary" onclick="hideSemesterForm()">Hủy</button>
+</div>
+<script src="/js/kihoc.js"></script>
 
 
 <!-- Giao DIện thống kê -->
@@ -929,13 +963,14 @@ async function fetchClassrooms() {
 <script src="/js/loadDegree.js"></script>
 <script src="/js/giaovien.js"></script>
 <script>
-    function    hideAllPanels() {
+    function hideAllPanels() {
         document.getElementById('subjectPanel').style.display = 'none';
         document.getElementById('classroomPanel').style.display = 'none';
         document.getElementById('teacherPanel').style.display='none' ;
         document.getElementById('departmentPanel').style.display='none';
         document.getElementById('teachingStatsPanel').style.display='none';
         document.getElementById('degreePanel').style.display = 'none' ;
+        document.getElementById('semesterPanel').style.display ='none' ;
         // Thêm các panel khác nếu cần
     }
 </script>

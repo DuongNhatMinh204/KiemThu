@@ -20,7 +20,11 @@ public enum ErrorCode {
     FULL_NAME_DEGREE_EXISTS(1013, "Full name degree existed", HttpStatus.BAD_REQUEST),
     SHORT_NAME_DEGREE_EXISTS(1014, "Short nmae degree existed", HttpStatus.BAD_REQUEST),
     TEACHER_SALARY_NOT_FOUND(1015, "Teacher salary not found", HttpStatus.BAD_REQUEST),
-    ;
+    EXISTS_SEMESTER_NAME(1016, "Exists semester name" , HttpStatus.BAD_REQUEST),
+    TIME_BEGIN_INVALID(1017, "time begin invalid" , HttpStatus.BAD_REQUEST),
+    TIME_END_INVALID(1018, "time end invalid" , HttpStatus.BAD_REQUEST),
+    SEMESTER_NAME_NOT_VALID(1019, "semester name not valid "  ,HttpStatus.BAD_REQUEST),
+    SCHOOL_YEAR_INVALID(1020,"school year not valid" , HttpStatus.BAD_REQUEST ),;
 
     private int code ;
     private String message ;
