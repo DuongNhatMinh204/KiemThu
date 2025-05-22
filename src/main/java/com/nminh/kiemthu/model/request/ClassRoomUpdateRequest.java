@@ -9,9 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClassRoomCreateDTO {
-    private int numberOfClasses ;// số lớp
+public class ClassRoomUpdateRequest {
+
     private int numberOfStudents; // số sinh viên
-    private Long semesterId;
-    private Long subjectId;
+    private Long teacherId;
 }

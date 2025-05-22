@@ -5,11 +5,13 @@ import com.nminh.kiemthu.entity.*;
 import com.nminh.kiemthu.enums.ErrorCode;
 import com.nminh.kiemthu.exception.AppException;
 import com.nminh.kiemthu.model.request.ClassRoomCreateDTO;
+import com.nminh.kiemthu.model.request.ClassRoomUpdateRequest;
 import com.nminh.kiemthu.repository.*;
 import com.nminh.kiemthu.service.ClassroomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,19 +29,41 @@ public class ClassRoomServiceImpl implements ClassroomService {
     private DepartmentRepository departmentRepository;
 
     @Override
-    public ClassRoom createClassroom(ClassRoomCreateDTO classRoomCreateDTO) {
+    public List<ClassRoom> createClassroom(ClassRoomCreateDTO classRoomCreateDTO) {
         Semester semester = semesterRepository.findById(classRoomCreateDTO.getSemesterId())
                 .orElseThrow(() -> new AppException(ErrorCode.SEMESTER_NOT_FOUND));
         Subject subject = subjectRepository.findById(classRoomCreateDTO.getSubjectId())
                 .orElseThrow(()-> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
-        Teacher teacher = teacherRepository.findById(classRoomCreateDTO.getTeacherId())
-                .orElseThrow(()->new AppException(ErrorCode.TEACHER_NOT_FOUND));
+        List<ClassRoom> classRooms = new ArrayList<>();
+        for(int i = 0 ; i < classRoomCreateDTO.getNumberOfClasses() ; i++) {
+            ClassRoom classRoom = new ClassRoom(classRoomCreateDTO.getNumberOfStudents() ,  semester , subject);
+            String className = determineClassName(subject.getSubjectName())+ (i+1) ;
+            classRoom.setClassName(className);
+            classRoomRepository.save(classRoom);
+            classRooms.add(classRoom);
 
-        ClassRoom classRoom = new ClassRoom(classRoomCreateDTO.getClassName(),classRoomCreateDTO.getNumberOfStudents(), semester, subject, teacher);
-
-        return classRoomRepository.save(classRoom);
+        }
+        return classRooms;
     }
 
+    private String determineClassName(String subjectName ){
+        if (subjectName == null || subjectName.trim().isEmpty()) {
+            return "";
+        }
+
+        // Tách từng từ ra bằng khoảng trắng
+        String[] words = subjectName.trim().split("\\s+");
+        StringBuilder res = new StringBuilder();
+
+        // Lấy chữ cái đầu tiên của mỗi từ và viết hoa
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                res.append(Character.toUpperCase(word.charAt(0)));
+            }
+        }
+
+        return res.toString();
+    }
     @Override
     public List<ClassRoom> getListClassrooms(Long departmentId, Long semesterId) {
         Department department = departmentRepository.findById(departmentId)
@@ -62,15 +86,14 @@ public class ClassRoomServiceImpl implements ClassroomService {
     }
 
     @Override
-    public ClassRoom changeClassRoom(Long id, ClassRoomCreateDTO classRoomChangeDTO) {
+    public ClassRoom changeClassRoom(Long id, ClassRoomUpdateRequest classRoomUpdateRequest) {
         ClassRoom classRoom = classRoomRepository.findById(id)
                 .orElseThrow(()-> new AppException(ErrorCode.CLASS_NOT_FOUND));
-        Teacher teacher = teacherRepository.findById(classRoomChangeDTO.getTeacherId())
+        Teacher teacher = teacherRepository.findById(classRoomUpdateRequest.getTeacherId())
                         .orElseThrow(()-> new AppException(ErrorCode.TEACHER_NOT_FOUND));
-        classRoom.setClassName(classRoomChangeDTO.getClassName());
-        classRoom.setNumberOfStudents(classRoomChangeDTO.getNumberOfStudents());
+        classRoom.setNumberOfStudents(classRoomUpdateRequest.getNumberOfStudents());
         classRoom.setTeacher(teacher);
-        int numberOfStudents = classRoomChangeDTO.getNumberOfStudents();
+        int numberOfStudents = classRoomUpdateRequest.getNumberOfStudents();
         Double coe ;
         if(numberOfStudents>0 && numberOfStudents < 20) {
              coe = Constant.NUMBER_STUDENT_LESS_THAN_TWENTY ;
@@ -97,12 +120,13 @@ public class ClassRoomServiceImpl implements ClassroomService {
     public List<ClassRoom> findClassRoomsBySemesterId(Long semesterId) {
         return classRoomRepository.findBySemesterId(semesterId);
     }
-    @Override
-    public List<ClassRoom> findClassRoomsBySemesterName(String semesterName) {
-        return classRoomRepository.findBySemesterName(semesterName);
-    }
-    @Override
-    public List<ClassRoom> findClassRoomsBySemesterIdAndTeacherId(Long semesterId, Long teacherId) {
-        return classRoomRepository.findBySemesterIdAndTeacherId(semesterId, teacherId);
-    }
+
+//    @Override
+//    public List<ClassRoom> findClassRoomsBySemesterName(String semesterName) {
+//        return classRoomRepository.findBySemesterName(semesterName);
+//    }
+//    @Override
+//    public List<ClassRoom> findClassRoomsBySemesterIdAndTeacherId(Long semesterId, Long teacherId) {
+//        return classRoomRepository.findBySemesterIdAndTeacherId(semesterId, teacherId);
+//    }
 }

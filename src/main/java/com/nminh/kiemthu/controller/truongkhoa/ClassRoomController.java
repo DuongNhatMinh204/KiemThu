@@ -2,6 +2,7 @@ package com.nminh.kiemthu.controller.truongkhoa;
 
 import com.nminh.kiemthu.entity.ClassRoom;
 import com.nminh.kiemthu.model.request.ClassRoomCreateDTO;
+import com.nminh.kiemthu.model.request.ClassRoomUpdateRequest;
 import com.nminh.kiemthu.model.response.ApiResponse;
 import com.nminh.kiemthu.service.ClassroomService;
 import jakarta.validation.Valid;
@@ -23,8 +24,8 @@ public class ClassRoomController {
     public ApiResponse createClassRoom(@Valid @RequestBody ClassRoomCreateDTO classRoomCreateDTO) {
         log.info("ClassRoomController.createClassRoom");
         ApiResponse response = new ApiResponse();
-        ClassRoom classRoom= classroomService.createClassroom(classRoomCreateDTO);
-        response.setData(classRoom);
+        List<ClassRoom> classRooms= classroomService.createClassroom(classRoomCreateDTO);
+        response.setData(classRooms);
         response.setMessage("ClassRoom created");
         return response;
     }
@@ -50,42 +51,42 @@ public class ClassRoomController {
     }
 
     @PutMapping("/change/{id}")
-    public ApiResponse changeClassRoom(@PathVariable Long id , @RequestBody ClassRoomCreateDTO classRoomChangeDTO) {
+    public ApiResponse changeClassRoom(@PathVariable Long id , @RequestBody ClassRoomUpdateRequest classRoomUpdateRequest) {
         log.info("ClassRoomController.changeClassRoom");
         ApiResponse response = new ApiResponse();
-        response.setData(classroomService.changeClassRoom(id, classRoomChangeDTO));
+        response.setData(classroomService.changeClassRoom(id, classRoomUpdateRequest));
         response.setMessage("ClassRoom changed");
         return response;
     }
-    @GetMapping("/by-semester-id/{semesterId}")
-    public ApiResponse getClassRoomsBySemesterId(@PathVariable Long semesterId) {
-        log.info("ClassRoomController.getClassRoomsBySemesterId with semesterId: {}", semesterId);
-        ApiResponse response = new ApiResponse();
-        List<ClassRoom> classRooms = classroomService.findClassRoomsBySemesterId(semesterId);
-        response.setData(classRooms);
-        response.setMessage("ClassRooms retrieved by semesterId");
-        return response;
-    }
-
-    @GetMapping("/by-semester-name/{semesterName}")
-    public ApiResponse getClassRoomsBySemesterName(@PathVariable String semesterName) {
-        log.info("ClassRoomController.getClassRoomsBySemesterName with semesterName: {}", semesterName);
-        ApiResponse response = new ApiResponse();
-        List<ClassRoom> classRooms = classroomService.findClassRoomsBySemesterName(semesterName);
-        response.setData(classRooms);
-        response.setMessage("ClassRooms retrieved by semesterName");
-        return response;
-    }
-
-    @GetMapping("/by-semester-id-and-teacher-id")
-    public ApiResponse getClassRoomsBySemesterIdAndTeacherId(
-            @RequestParam Long semesterId,
-            @RequestParam Long teacherId) {
-        log.info("ClassRoomController.getClassRoomsBySemesterIdAndTeacherId with semesterId: {}, teacherId: {}", semesterId, teacherId);
-        ApiResponse response = new ApiResponse();
-        List<ClassRoom> classRooms = classroomService.findClassRoomsBySemesterIdAndTeacherId(semesterId, teacherId);
-        response.setData(classRooms);
-        response.setMessage("ClassRooms retrieved by semesterId and teacherId");
-        return response;
-    }
+//    @GetMapping("/by-semester-id/{semesterId}")
+//    public ApiResponse getClassRoomsBySemesterId(@PathVariable Long semesterId) {
+//        log.info("ClassRoomController.getClassRoomsBySemesterId with semesterId: {}", semesterId);
+//        ApiResponse response = new ApiResponse();
+//        List<ClassRoom> classRooms = classroomService.findClassRoomsBySemesterId(semesterId);
+//        response.setData(classRooms);
+//        response.setMessage("ClassRooms retrieved by semesterId");
+//        return response;
+//    }
+//
+//    @GetMapping("/by-semester-name/{semesterName}")
+//    public ApiResponse getClassRoomsBySemesterName(@PathVariable String semesterName) {
+//        log.info("ClassRoomController.getClassRoomsBySemesterName with semesterName: {}", semesterName);
+//        ApiResponse response = new ApiResponse();
+//        List<ClassRoom> classRooms = classroomService.findClassRoomsBySemesterName(semesterName);
+//        response.setData(classRooms);
+//        response.setMessage("ClassRooms retrieved by semesterName");
+//        return response;
+//    }
+//
+//    @GetMapping("/by-semester-id-and-teacher-id")
+//    public ApiResponse getClassRoomsBySemesterIdAndTeacherId(
+//            @RequestParam Long semesterId,
+//            @RequestParam Long teacherId) {
+//        log.info("ClassRoomController.getClassRoomsBySemesterIdAndTeacherId with semesterId: {}, teacherId: {}", semesterId, teacherId);
+//        ApiResponse response = new ApiResponse();
+//        List<ClassRoom> classRooms = classroomService.findClassRoomsBySemesterIdAndTeacherId(semesterId, teacherId);
+//        response.setData(classRooms);
+//        response.setMessage("ClassRooms retrieved by semesterId and teacherId");
+//        return response;
+//    }
 }

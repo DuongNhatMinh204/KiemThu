@@ -337,29 +337,20 @@
             <div class="modal-body">
                 <form id="addClassroomForm">
                     <div class="mb-3">
-                        <label for="className" class="form-label">Tên lớp</label>
-                        <input type="text" class="form-control" id="className" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="numberOfStudents" class="form-label">Số sinh viên</label>
+                        <label class="form-label">Số sinh viên mỗi lớp</label>
                         <input type="number" class="form-control" id="numberOfStudents" required>
                     </div>
                     <div class="mb-3">
-                        <label for="subjectSelect" class="form-label">Môn học</label>
-                        <select class="form-select" id="subjectSelect" required>
-                            <option value="">-- Vui lòng chọn môn học --</option>
-                            <!-- Các option sẽ được thêm bằng JavaScript -->
-                        </select>
+                        <label class="form-label">Số lượng lớp cần tạo</label>
+                        <input type="number" class="form-control" id="numberOfClasses" required>
                     </div>
                     <div class="mb-3">
-                        <label for="teacherSelect" class="form-label">Giảng viên</label>
-                        <select class="form-select" id="teacherSelect" required>
-                            <option value="">-- Vui lòng chọn giảng viên --</option>
-                            <!-- Các option sẽ được thêm bằng JavaScript -->
-                        </select>
+                        <label class="form-label">Môn học</label>
+                        <select class="form-select" id="subjectSelect" required></select>
                     </div>
                     <button type="submit" class="btn btn-primary">Lưu</button>
                 </form>
+
             </div>
         </div>
     </div>
@@ -375,10 +366,6 @@
             <div class="modal-body">
                 <form id="editClassroomForm">
                     <input type="hidden" id="editClassroomId">
-                    <div class="mb-3">
-                        <label for="editClassName" class="form-label">Tên lớp</label>
-                        <input type="text" class="form-control" id="editClassName" required>
-                    </div>
                     <div class="mb-3">
                         <label for="editNumberOfStudents" class="form-label">Số sinh viên</label>
                         <input type="number" class="form-control" id="editNumberOfStudents" required>
@@ -609,7 +596,7 @@ async function fetchClassrooms() {
         <td>${cls.numberOfStudents}</td>
         <td>${cls.classCoefficient}</td>
         <td>${cls.subject.subjectName}</td>
-        <td>${cls.teacher.fullName}</td>
+        <td>${cls.teacher ? cls.teacher.fullName : 'Chưa có'}</td>
         <td>${cls.semester.semesterName} (${cls.semester.schoolYear})</td>
         <td>
             <button class="btn btn-danger btn-sm" onclick="deleteClassroom(${cls.id})">🗑️ Xóa</button>
@@ -643,17 +630,17 @@ async function fetchClassrooms() {
             subjectSelect.appendChild(opt);
         });
 
-        // Lấy danh sách giảng viên
-        const teacherRes = await fetch(`/admin/teacher/get-all-of-department/${departmentId}`);
-        const teacherData = await teacherRes.json();
-        const teacherSelect = document.getElementById('teacherSelect');
-        teacherSelect.innerHTML = '<option value="">-- Vui lòng chọn giảng viên --</option>';
-        teacherData.data.forEach(teacher => {
-            const opt = document.createElement('option');
-            opt.value = teacher.id;
-            opt.textContent = teacher.fullName;
-            teacherSelect.appendChild(opt);
-        });
+        // // Lấy danh sách giảng viên
+        // const teacherRes = await fetch(`/admin/teacher/get-all-of-department/${departmentId}`);
+        // const teacherData = await teacherRes.json();
+        // const teacherSelect = document.getElementById('teacherSelect');
+        // teacherSelect.innerHTML = '<option value="">-- Vui lòng chọn giảng viên --</option>';
+        // teacherData.data.forEach(teacher => {
+        //     const opt = document.createElement('option');
+        //     opt.value = teacher.id;
+        //     opt.textContent = teacher.fullName;
+        //     teacherSelect.appendChild(opt);
+        // });
 
         // Hiển thị modal
         const addClassroomModal = new bootstrap.Modal(document.getElementById('addClassroomModal'));
@@ -663,17 +650,17 @@ async function fetchClassrooms() {
     document.getElementById('addClassroomForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const className = document.getElementById('className').value;
+        const numberOfClasses = document.getElementById('numberOfClasses').value;
         const numberOfStudents = document.getElementById('numberOfStudents').value;
         const subjectId = document.getElementById('subjectSelect').value;
-        const teacherId = document.getElementById('teacherSelect').value;
+        // const teacherId = document.getElementById('teacherSelect').value;
         const semesterId = document.getElementById('semesterSelect').value;
 
         const payload = {
-            className,
             numberOfStudents: parseInt(numberOfStudents),
+            numberOfClasses: parseInt(numberOfClasses),
             subjectId: parseInt(subjectId),
-            teacherId: parseInt(teacherId),
+            // teacherId: parseInt(teacherId),
             semesterId: parseInt(semesterId)
         };
 
@@ -729,11 +716,13 @@ async function fetchClassrooms() {
         currentClassroom = cls; // Lưu để sử dụng khi submit
 
         document.getElementById('editClassroomId').value = cls.id;
-        document.getElementById('editClassName').value = cls.className;
         document.getElementById('editNumberOfStudents').value = cls.numberOfStudents;
 
         // Tải danh sách giảng viên theo khoa lớp học
-        const departmentId = cls.teacher.department.id;
+        // const departmentId = cls.teacher.department.id;
+        const departmentId = cls.teacher
+            ? cls.teacher.department.id
+            : cls.subject.department.id;
         const res = await fetch(`/admin/teacher/get-all-of-department/${departmentId}`);
         const json = await res.json();
 
@@ -743,7 +732,11 @@ async function fetchClassrooms() {
             const opt = document.createElement('option');
             opt.value = t.id;
             opt.textContent = t.fullName;
-            if (t.id === cls.teacher.id) opt.selected = true;
+            // if (t.id === cls.teacher.id) opt.selected = true;
+            if (cls.teacher != null && cls.teacher.id != null && t.id === cls.teacher.id) {
+                opt.selected = true;
+            }
+
             teacherSelect.appendChild(opt);
         });
 
@@ -754,7 +747,6 @@ async function fetchClassrooms() {
         e.preventDefault();
 
         const id = document.getElementById('editClassroomId').value;
-        const className = document.getElementById('editClassName').value;
         const numberOfStudents = parseInt(document.getElementById('editNumberOfStudents').value);
         const teacherId = parseInt(document.getElementById('editTeacherSelect').value);
 
@@ -767,7 +759,6 @@ async function fetchClassrooms() {
         const semesterId = currentClassroom.semester.id;
 
         const payload = {
-            className,
             numberOfStudents,
             teacherId,
             subjectId,

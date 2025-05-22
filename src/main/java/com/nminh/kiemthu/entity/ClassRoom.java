@@ -54,6 +54,12 @@ public class ClassRoom {
             return 0 ;
         }
     }
+    public ClassRoom(int numberOfStudents , Semester semester , Subject subject){
+        this.numberOfStudents = numberOfStudents;
+        this.semester = semester;
+        this.subject = subject;
+        this.classCoefficient = determineCoeficient(numberOfStudents);
+    }
 
     public ClassRoom(String className, int numberOfStudents, Semester semester, Subject subject,Teacher teacher) {
         this.className = className;
