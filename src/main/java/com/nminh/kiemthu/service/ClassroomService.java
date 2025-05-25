@@ -13,7 +13,7 @@ public interface ClassroomService {
     ClassRoom changeClassRoom(Long id , ClassRoomUpdateRequest classRoomUpdateRequest);
     public List<ClassRoom> findClassRoomsBySemesterId(Long semesterId);
 
-//    // 2. Tìm kiếm ClassRoom theo SemesterName
-//    public List<ClassRoom> findClassRoomsBySemesterName(String semesterName);
-//    public List<ClassRoom> findClassRoomsBySemesterIdAndTeacherId(Long semesterId, Long teacherId);
+    // 2. Tìm kiếm ClassRoom theo SemesterName
+    public List<ClassRoom> findClassRoomsBySemesterName(String semesterName);
+    public List<ClassRoom> findClassRoomsBySemesterIdAndTeacherId(Long semesterId, Long teacherId);
 }

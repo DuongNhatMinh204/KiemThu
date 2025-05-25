@@ -58,35 +58,35 @@ public class ClassRoomController {
         response.setMessage("ClassRoom changed");
         return response;
     }
-//    @GetMapping("/by-semester-id/{semesterId}")
-//    public ApiResponse getClassRoomsBySemesterId(@PathVariable Long semesterId) {
-//        log.info("ClassRoomController.getClassRoomsBySemesterId with semesterId: {}", semesterId);
-//        ApiResponse response = new ApiResponse();
-//        List<ClassRoom> classRooms = classroomService.findClassRoomsBySemesterId(semesterId);
-//        response.setData(classRooms);
-//        response.setMessage("ClassRooms retrieved by semesterId");
-//        return response;
-//    }
-//
-//    @GetMapping("/by-semester-name/{semesterName}")
-//    public ApiResponse getClassRoomsBySemesterName(@PathVariable String semesterName) {
-//        log.info("ClassRoomController.getClassRoomsBySemesterName with semesterName: {}", semesterName);
-//        ApiResponse response = new ApiResponse();
-//        List<ClassRoom> classRooms = classroomService.findClassRoomsBySemesterName(semesterName);
-//        response.setData(classRooms);
-//        response.setMessage("ClassRooms retrieved by semesterName");
-//        return response;
-//    }
-//
-//    @GetMapping("/by-semester-id-and-teacher-id")
-//    public ApiResponse getClassRoomsBySemesterIdAndTeacherId(
-//            @RequestParam Long semesterId,
-//            @RequestParam Long teacherId) {
-//        log.info("ClassRoomController.getClassRoomsBySemesterIdAndTeacherId with semesterId: {}, teacherId: {}", semesterId, teacherId);
-//        ApiResponse response = new ApiResponse();
-//        List<ClassRoom> classRooms = classroomService.findClassRoomsBySemesterIdAndTeacherId(semesterId, teacherId);
-//        response.setData(classRooms);
-//        response.setMessage("ClassRooms retrieved by semesterId and teacherId");
-//        return response;
-//    }
+    @GetMapping("/by-semester-id/{semesterId}")
+    public ApiResponse getClassRoomsBySemesterId(@PathVariable Long semesterId) {
+        log.info("ClassRoomController.getClassRoomsBySemesterId with semesterId: {}", semesterId);
+        ApiResponse response = new ApiResponse();
+        List<ClassRoom> classRooms = classroomService.findClassRoomsBySemesterId(semesterId);
+        response.setData(classRooms);
+        response.setMessage("ClassRooms retrieved by semesterId");
+        return response;
+    }
+
+    @GetMapping("/by-semester-name/{semesterName}")
+    public ApiResponse getClassRoomsBySemesterName(@PathVariable String semesterName) {
+        log.info("ClassRoomController.getClassRoomsBySemesterName with semesterName: {}", semesterName);
+        ApiResponse response = new ApiResponse();
+        List<ClassRoom> classRooms = classroomService.findClassRoomsBySemesterName(semesterName);
+        response.setData(classRooms);
+        response.setMessage("ClassRooms retrieved by semesterName");
+        return response;
+    }
+
+    @GetMapping("/by-semester-id-and-teacher-id")
+    public ApiResponse getClassRoomsBySemesterIdAndTeacherId(
+            @RequestParam Long semesterId,
+            @RequestParam Long teacherId) {
+        log.info("ClassRoomController.getClassRoomsBySemesterIdAndTeacherId with semesterId: {}, teacherId: {}", semesterId, teacherId);
+        ApiResponse response = new ApiResponse();
+        List<ClassRoom> classRooms = classroomService.findClassRoomsBySemesterIdAndTeacherId(semesterId, teacherId);
+        response.setData(classRooms);
+        response.setMessage("ClassRooms retrieved by semesterId and teacherId");
+        return response;
+    }
 }

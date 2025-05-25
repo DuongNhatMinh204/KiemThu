@@ -121,12 +121,12 @@ public class ClassRoomServiceImpl implements ClassroomService {
         return classRoomRepository.findBySemesterId(semesterId);
     }
 
-//    @Override
-//    public List<ClassRoom> findClassRoomsBySemesterName(String semesterName) {
-//        return classRoomRepository.findBySemesterName(semesterName);
-//    }
-//    @Override
-//    public List<ClassRoom> findClassRoomsBySemesterIdAndTeacherId(Long semesterId, Long teacherId) {
-//        return classRoomRepository.findBySemesterIdAndTeacherId(semesterId, teacherId);
-//    }
+    @Override
+    public List<ClassRoom> findClassRoomsBySemesterName(String semesterName) {
+        return classRoomRepository.findBySemesterName(semesterName);
+    }
+    @Override
+    public List<ClassRoom> findClassRoomsBySemesterIdAndTeacherId(Long semesterId, Long teacherId) {
+        return classRoomRepository.findBySemesterIdAndTeacherId(semesterId, teacherId);
+    }
 }
