@@ -56,7 +56,7 @@ public class SemesterServiceImpl implements SemesterService {
                 }
                 // nếu tgian bắt đầu ở giữa thời gian bắt đầu kì  và  thời gian kết thúc kì khác
                 if(semesterCreateDTO.getTimeBegin().isAfter(s.getTimeBegin()) && semesterCreateDTO.getTimeEnd().isBefore(s.getTimeEnd())) {
-                    throw new AppException(ErrorCode.TIME_BEGIN_INVALID) ;
+                    throw new AppException(ErrorCode.TIME_BEGINg_INVALID) ;
                 }
                 // nếu thời gian kết thúc ở giữa thời gian bắt đầu kì và thời gian kết thúc kì khác
                 if(semesterCreateDTO.getTimeEnd().isAfter(s.getTimeBegin()) && semesterCreateDTO.getTimeBegin().isBefore(s.getTimeEnd())) {
