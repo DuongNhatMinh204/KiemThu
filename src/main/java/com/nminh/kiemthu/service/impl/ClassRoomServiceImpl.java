@@ -34,6 +34,12 @@ public class ClassRoomServiceImpl implements ClassroomService {
                 .orElseThrow(() -> new AppException(ErrorCode.SEMESTER_NOT_FOUND));
         Subject subject = subjectRepository.findById(classRoomCreateDTO.getSubjectId())
                 .orElseThrow(()-> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+        if (classRoomCreateDTO.getNumberOfClasses() <= 0) {
+            throw new AppException(ErrorCode.NUMBER_OF_CLASSES_NOT_VALID);
+        }
+        if (classRoomCreateDTO.getNumberOfStudents() <= 0) {
+            throw new AppException(ErrorCode.NUMBER_OF_STUDENT_NOT_VALID);
+        }
         List<ClassRoom> classRooms = new ArrayList<>();
         for(int i = 0 ; i < classRoomCreateDTO.getNumberOfClasses() ; i++) {
             ClassRoom classRoom = new ClassRoom(classRoomCreateDTO.getNumberOfStudents() ,  semester , subject);
@@ -91,6 +97,9 @@ public class ClassRoomServiceImpl implements ClassroomService {
                 .orElseThrow(()-> new AppException(ErrorCode.CLASS_NOT_FOUND));
         Teacher teacher = teacherRepository.findById(classRoomUpdateRequest.getTeacherId())
                         .orElseThrow(()-> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+        if(classRoomUpdateRequest.getNumberOfStudents() <= 0) {
+            throw  new AppException(ErrorCode.NUMBER_OF_STUDENT_NOT_VALID) ;
+        }
         classRoom.setNumberOfStudents(classRoomUpdateRequest.getNumberOfStudents());
         classRoom.setTeacher(teacher);
         int numberOfStudents = classRoomUpdateRequest.getNumberOfStudents();

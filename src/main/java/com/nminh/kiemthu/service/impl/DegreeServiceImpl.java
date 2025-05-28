@@ -29,6 +29,18 @@ public class DegreeServiceImpl implements DegreeService {
                 throw new AppException(ErrorCode.SHORT_NAME_DEGREE_EXISTS) ;
             }
         }
+        for(int i = 0 ; i < degreeCreateDTO.getShortName().length() ; i++) {
+            char ch = degreeCreateDTO.getShortName().charAt(i);
+            if(Character.isDigit(ch)) {
+                throw new AppException(ErrorCode.SHORT_NAME_NOT_VALID) ;
+            }
+        }
+        for(int i = 0 ; i < degreeCreateDTO.getFullName().length() ; i++) {
+            char ch = degreeCreateDTO.getFullName().charAt(i);
+            if(Character.isDigit(ch)) {
+                throw new AppException(ErrorCode.FULL_NAME_NOT_VALID) ;
+            }
+        }
 
         degree.setShortName(degreeCreateDTO.getShortName());
         degree.setFullName(degreeCreateDTO.getFullName());
@@ -65,7 +77,18 @@ public class DegreeServiceImpl implements DegreeService {
                 throw new AppException(ErrorCode.SHORT_NAME_DEGREE_EXISTS) ;
             }
         }
-
+        for(int i = 0 ; i < degreeCreateDTO.getShortName().length() ; i++) {
+            char ch = degreeCreateDTO.getShortName().charAt(i);
+            if(Character.isDigit(ch)) {
+                throw new AppException(ErrorCode.SHORT_NAME_NOT_VALID) ;
+            }
+        }
+        for(int i = 0 ; i < degreeCreateDTO.getFullName().length() ; i++) {
+            char ch = degreeCreateDTO.getFullName().charAt(i);
+            if(Character.isDigit(ch)) {
+                throw new AppException(ErrorCode.FULL_NAME_NOT_VALID) ;
+            }
+        }
 
         degree.setShortName(degreeCreateDTO.getShortName());
         degree.setFullName(degreeCreateDTO.getFullName());
