@@ -1,0 +1,187 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f7f7f7;
+}
+.header {
+  background: #1976d2;
+  color: #fff;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header .title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.container {
+  display: flex;
+  min-height: 90vh;
+}
+.sidebar {
+  width: 220px;
+  background: #263238;
+  color: #fff;
+  padding-top: 24px;
+}
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+.sidebar li {
+  padding: 14px 24px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.sidebar li.active, .sidebar li:hover {
+  background: #1976d2;
+}
+.content {
+  flex: 1;
+  padding: 32px 40px;
+  background: #fff;
+  min-height: 100vh;
+}
+.page {
+  display: none;
+}
+.page.active {
+  display: block;
+}
+form, .filters {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+label {
+  font-weight: 500;
+}
+select, input[type="text"], input[disabled] {
+  margin-left: 8px;
+  padding: 4px 8px;
+  font-size: 1em;
+}
+button {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background 0.2s;
+}
+button:hover {
+  background: #1565c0;
+}
+#teacherSalaryResult, #bulkCalcResult {
+  margin-top: 24px;
+}
+.card {
+  background: #f1f8e9;
+  border-radius: 8px;
+  padding: 18px 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.small-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+.small-table th, .small-table td {
+  border: 1px solid #bdbdbd;
+  padding: 6px 10px;
+  font-size: 0.98em;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  background: #fafafa;
+}
+.data-table th, .data-table td {
+  border: 1px solid #bdbdbd;
+  padding: 8px 12px;
+  text-align: left;
+}
+.data-table th {
+  background: #e3f2fd;
+}
+.data-table td.actions {
+  text-align: center;
+}
+.data-table button {
+  margin-right: 6px;
+  padding: 4px 10px;
+  font-size: 0.95em;
+}
+.status-paid {
+  color: #388e3c;
+  font-weight: bold;
+}
+.status-unpaid {
+  color: #d32f2f;
+  font-weight: bold;
+}
+.loading {
+  display: none;
+  position: fixed;
+  top: 48%;
+  left: 48%;
+  background: #fff;
+  color: #1976d2;
+  font-size: 1.2em;
+  padding: 16px 28px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  z-index: 1000;
+}
+.error {
+  color: #d32f2f;
+  margin-top: 8px;
+  font-size: 0.98em;
+}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.25);
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: #fff;
+  padding: 28px 32px;
+  border-radius: 10px;
+  min-width: 340px;
+  position: relative;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+}
+.close {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  font-size: 1.6em;
+  color: #888;
+  cursor: pointer;
+}
+.modal-actions {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+@media (max-width: 900px) {
+  .container { flex-direction: column; }
+  .sidebar { width: 100%; }
+  .content { padding: 18px 8px; }
+}

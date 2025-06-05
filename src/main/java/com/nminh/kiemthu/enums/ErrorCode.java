@@ -24,7 +24,10 @@ public enum ErrorCode {
     TIME_BEGIN_INVALID(1017, "time begin invalid" , HttpStatus.BAD_REQUEST),
     TIME_END_INVALID(1018, "time end invalid" , HttpStatus.BAD_REQUEST),
     SEMESTER_NAME_NOT_VALID(1019, "semester name not valid "  ,HttpStatus.BAD_REQUEST),
-    SCHOOL_YEAR_INVALID(1020,"school year not valid" , HttpStatus.BAD_REQUEST ),;
+    SCHOOL_YEAR_INVALID(1020,"school year not valid" , HttpStatus.BAD_REQUEST ),
+    DEGREE_NOT_FOUND(1021,"degree not found", HttpStatus.BAD_REQUEST),
+    TUITION_NOT_FOUND(1022, "tuition not found", HttpStatus.BAD_REQUEST),
+    PAYMENT_STATUS_UPDATE_NOT_ALLOWED(1023, "payment status update not allowed", HttpStatus.BAD_REQUEST);
 
     private int code ;
     private String message ;

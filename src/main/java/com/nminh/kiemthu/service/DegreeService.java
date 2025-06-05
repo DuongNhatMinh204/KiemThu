@@ -10,4 +10,6 @@ public interface DegreeService {
     List<Degree> getAllDegrees();
     String deleteDegree(Long degreeId);
     Degree update(Long id , DegreeCreateDTO degreeCreateDTO);
+
+    void setDegreeCoefficient(Long id, Double coefficient);
 }

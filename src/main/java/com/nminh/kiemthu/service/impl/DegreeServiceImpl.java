@@ -29,7 +29,7 @@ public class DegreeServiceImpl implements DegreeService {
                 throw new AppException(ErrorCode.SHORT_NAME_DEGREE_EXISTS) ;
             }
         }
-
+        degree.setDegreeCoefficient(0.0);
         degree.setShortName(degreeCreateDTO.getShortName());
         degree.setFullName(degreeCreateDTO.getFullName());
 
@@ -52,7 +52,7 @@ public class DegreeServiceImpl implements DegreeService {
 
     @Override
     public Degree update(Long id, DegreeCreateDTO degreeCreateDTO) {
-        Degree degree = degreeRepository.findById(id).get();
+        Degree degree = degreeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.DEGREE_NOT_FOUND));
         List<Degree> degrees = degreeRepository.findAll();
         for (Degree degree1 : degrees) {
             if(degree1 == degree) {
@@ -65,12 +65,16 @@ public class DegreeServiceImpl implements DegreeService {
                 throw new AppException(ErrorCode.SHORT_NAME_DEGREE_EXISTS) ;
             }
         }
-
-
         degree.setShortName(degreeCreateDTO.getShortName());
         degree.setFullName(degreeCreateDTO.getFullName());
 
-
         return degreeRepository.save(degree);
+    }
+    @Override
+    public void setDegreeCoefficient(Long id, Double coefficient){
+        Degree degree = degreeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.DEGREE_NOT_FOUND));
+        degree.setDegreeCoefficient(coefficient);
+
+        return;
     }
 }

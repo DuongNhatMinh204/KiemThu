@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TeacherSalaryResponse {
-    private TeacherResponse teacherRespose;
+    private TeacherResponse teacherResponse;
     private List<String> classRoom;
     private double totalHoursTeaching;
     private double totalSalary;
