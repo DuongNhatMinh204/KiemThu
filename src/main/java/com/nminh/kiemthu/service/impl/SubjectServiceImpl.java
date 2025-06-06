@@ -25,7 +25,12 @@ public class SubjectServiceImpl implements SubjectService {
     public Subject createSubject(SubjectCreateDTO subjectCreateDTO) {
         Department department = departmentRepository.findById(subjectCreateDTO.getDepartmentId())
                 .orElseThrow(()->new AppException(ErrorCode.DEPARTMENT_NOT_FOUND)) ;
-
+        if(subjectCreateDTO.getCredits() <= 0 ) {
+            throw  new AppException(ErrorCode.NUMBER_OF_CREDIT_NOT_VALID) ;
+        }
+        if(subjectCreateDTO.getNumberOfLessons() <= 0){
+            throw new AppException(ErrorCode.NUMBER_OF_LESSON_NOT_VALID) ;
+        }
         Subject subject = new Subject();
 
         subject.setSubjectName(subjectCreateDTO.getSubjectName());
@@ -52,6 +57,12 @@ public class SubjectServiceImpl implements SubjectService {
                 .orElseThrow(()->new AppException(ErrorCode.SUBJECT_NOT_FOUND));
         Department department = departmentRepository.findById(subjectChangeDTO.getDepartmentId())
                         .orElseThrow(()->new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
+        if(subjectChangeDTO.getCredits() <= 0 ) {
+            throw  new AppException(ErrorCode.NUMBER_OF_CREDIT_NOT_VALID) ;
+        }
+        if(subjectChangeDTO.getNumberOfLessons() <= 0){
+            throw new AppException(ErrorCode.NUMBER_OF_LESSON_NOT_VALID) ;
+        }
         subject.setSubjectName(subjectChangeDTO.getSubjectName());
         subject.setCredits(subjectChangeDTO.getCredits());
         subject.setModule_coefficient(subjectChangeDTO.getModule_coefficient());
