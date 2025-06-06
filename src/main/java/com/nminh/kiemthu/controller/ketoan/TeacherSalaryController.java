@@ -29,7 +29,11 @@ public class TeacherSalaryController {
         List<TeacherSalaryResponse> responses = teacherSalaryService.getTeacherSalariesBySemester(semesterId);
         return ResponseEntity.ok(responses);
     }
-
+    @GetMapping("/by-schoolYear")
+    public ResponseEntity<List<TeacherSalaryResponse>> getTeacherSalaryBySchoolYear(@RequestParam String year){
+        List<TeacherSalaryResponse> responses = teacherSalaryService.getTeacherAllSalariesBySchoolYear(year);
+        return ResponseEntity.ok(responses);
+    }
     @GetMapping("/by-semester-and-teacher")
     public ResponseEntity<TeacherSalaryResponse> getTeacherSalary(
             @RequestParam Long semesterId,

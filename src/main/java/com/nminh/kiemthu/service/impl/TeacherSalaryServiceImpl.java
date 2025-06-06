@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -110,6 +112,7 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
         teacherSalary.setSemester(semester);
         teacherSalary.setTotalHoursTeaching(soTietQuyDoi);
         teacherSalary.setTotalSalary(totalMoney);
+
         teacherSalary.setStatusPayment(com.nminh.kiemthu.enums.StatusPayment.CHUA_THANH_TOAN);
 
         TeacherSalary savedSalary = teacherSalaryRepository.save(teacherSalary);
@@ -199,24 +202,71 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
                 .collect(Collectors.toList());
         return mapToTeacherSalaryResponse(updatedSalary, classRooms);
     }
-
     @Override
-    public List<TeacherSalaryResponse> getTeacherAllSalariesBySemester(Long semesterId) {
-        Semester semester = semesterRepository.findById(semesterId)
-                .orElseThrow(() -> new AppException(ErrorCode.SEMESTER_NOT_FOUND));
-        List<TeacherSalary> teacherSalaries = teacherSalaryRepository.findBySemester(semester);
-        return teacherSalaries.stream()
-                .map(salary -> {
-                    List<ClassRoom> classRooms = classRoomRepository.findBySemesterIdAndTeacherId(
-                                    semesterId, salary.getTeacher().getId())
-                            .stream()
-                            .filter(classRoom -> classRoom.getTeacher() != null && classRoom.getTeacher().getId() != null)
-                            .collect(Collectors.toList());
-                    return mapToTeacherSalaryResponse(salary, classRooms);
-                })
-                .collect(Collectors.toList());
-    }
+    public List<TeacherSalaryResponse> getTeacherAllSalariesBySchoolYear(String year) {
+        List<Semester> semesters = semesterRepository.findBySchoolYear(year);
+        if (semesters.isEmpty()) {
+            throw new AppException(ErrorCode.SEMESTER_NOT_FOUND);
+        }
 
+        List<TeacherSalaryResponse> teacherSalaryResponses = new ArrayList<>();
+        Set<Long> teacherIds = new HashSet<>();
+
+        // Thu thập tất cả teacherIds từ các lớp trong các học kỳ
+        for (Semester semester : semesters) {
+            List<ClassRoom> classRooms = classRoomRepository.findBySemesterId(semester.getId())
+                    .stream()
+                    .filter(classRoom -> classRoom.getTeacher() != null && classRoom.getTeacher().getId() != null)
+                    .collect(Collectors.toList());
+            teacherIds.addAll(classRooms.stream()
+                    .map(classRoom -> classRoom.getTeacher().getId())
+                    .collect(Collectors.toSet()));
+        }
+
+        // Tính lương cho từng giáo viên
+        for (Long teacherId : teacherIds) {
+            Teacher teacher = teacherRepository.findById(teacherId)
+                    .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+            double totalHoursTeaching = 0.0;
+            double totalSalary = 0.0;
+            List<ClassRoom> allClassRooms = new ArrayList<>();
+
+            for (Semester semester : semesters) {
+                List<ClassRoom> teacherClassRooms = classRoomRepository.findBySemesterIdAndTeacherId(semester.getId(), teacherId)
+                        .stream()
+                        .filter(classRoom -> classRoom.getTeacher() != null && classRoom.getTeacher().getId() != null)
+                        .collect(Collectors.toList());
+
+                if (!teacherClassRooms.isEmpty()) {
+                    allClassRooms.addAll(teacherClassRooms);
+                    double semesterHours = 0.0;
+                    for (ClassRoom classRoom : teacherClassRooms) {
+                        semesterHours += classRoom.getSubject().getCredits() *
+                                (classRoom.getSubject().getModule_coefficient() + classRoom.getClassCoefficient());
+                    }
+                    Long amountPerLesson = getAmountPerLesson(semester.getId());
+                    Double heSoGiaoVien = teacher.getDegree().getDegreeCoefficient();
+                    totalHoursTeaching += semesterHours;
+                    totalSalary += semesterHours * heSoGiaoVien * amountPerLesson;
+                }
+            }
+
+            if (!allClassRooms.isEmpty()) {
+                TeacherSalary teacherSalary = teacherSalaryRepository.findByTeacherIdAndSemesterId(teacherId, semesters.get(0).getId())
+                        .orElse(new TeacherSalary());
+                teacherSalary.setTeacher(teacher);
+                teacherSalary.setSemester(semesters.get(0)); // Sử dụng học kỳ đầu tiên làm đại diện
+                teacherSalary.setTotalHoursTeaching(totalHoursTeaching);
+                teacherSalary.setTotalSalary(totalSalary);
+                teacherSalary.setStatusPayment(StatusPayment.CHUA_THANH_TOAN);
+
+                TeacherSalary savedSalary = teacherSalaryRepository.save(teacherSalary);
+                teacherSalaryResponses.add(mapToTeacherSalaryResponse(savedSalary, allClassRooms));
+            }
+        }
+
+        return teacherSalaryResponses;
+    }
     @Override
     public List<TeacherSalaryResponse> calculateTeacherAllSalaryByDepartment(Long departmentId) {
         // Lấy tất cả lớp trong khoa

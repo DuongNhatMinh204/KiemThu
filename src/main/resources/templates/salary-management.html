@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Quản lý tiền lương giáo viên</title>
-  <link rel="stylesheet" href="salary-management.css">
+  <link rel="stylesheet" href="/css/salary-management.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
@@ -31,10 +31,14 @@
         <h2>Tính lương giáo viên</h2>
         <form id="calcTeacherForm">
           <label>Chọn giáo viên:
-            <select id="teacherSelect" required></select>
+            <select id="teacherSelect" required>
+              <option value="">----Chọn giáo viên----</option>
+            </select>
           </label>
           <label>Chọn học kỳ:
-            <select id="semesterSelect" required></select>
+            <select id="semesterSelect" required>
+              <option value="">----Chọn học kỳ----</option>
+            </select>
           </label>
           <button type="submit">Tính lương</button>
         </form>
@@ -45,7 +49,9 @@
         <h2>Danh sách lương theo học kỳ</h2>
         <div class="filters">
           <label>Chọn học kỳ:
-            <select id="semesterListSelect"></select>
+            <select id="semesterListSelect">
+              <option value="">----Chọn học kỳ----</option>
+            </select>
           </label>
           <label>Lọc trạng thái:
             <select id="statusFilterSemester">
@@ -63,7 +69,9 @@
         <h2>Danh sách lương theo khoa</h2>
         <div class="filters">
           <label>Chọn khoa:
-            <select id="departmentSelect"></select>
+            <select id="departmentSelect">
+              <option value="">----------------Chọn khoa----------------</option>
+            </select>
           </label>
           <label>Lọc trạng thái:
             <select id="statusFilterDepartment">
@@ -81,7 +89,9 @@
         <h2>Danh sách lương theo năm</h2>
         <div class="filters">
           <label>Chọn năm:
-            <select id="yearSelect"></select>
+            <select id="yearSelect">
+              <option value="">----Chọn năm----</option>
+            </select>
           </label>
           <label>Lọc trạng thái:
             <select id="statusFilterYear">
@@ -99,13 +109,17 @@
         <p>Chọn học kỳ hoặc khoa để tính lương cho tất cả giáo viên.</p>
         <div>
           <label>Chọn học kỳ:
-            <select id="bulkSemesterSelect"></select>
+            <select id="bulkSemesterSelect">
+              <option value="">----Chọn học kỳ----</option>
+            </select>
           </label>
           <button id="bulkCalcSemesterOnlyBtn">Tính lương học kỳ</button>
         </div>
         <div>
           <label>Chọn khoa:
-            <select id="bulkDepartmentSelect"></select>
+            <select id="bulkDepartmentSelect">
+              <option value="">---------------Chọn khoa----------------</option>
+            </select>
           </label>
           <button id="bulkCalcDepartmentOnlyBtn">Tính lương khoa</button>
         </div>
@@ -139,6 +153,6 @@
     </div>
   </div>
   <div id="loading" class="loading">Đang tải...</div>
-  <script src="../static/js/salary-management.js"></script>
+  <script src="/js/salary-management.js"></script>
 </body>
 </html>
