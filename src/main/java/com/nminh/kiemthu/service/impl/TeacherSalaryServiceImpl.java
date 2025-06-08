@@ -16,6 +16,7 @@ import com.nminh.kiemthu.repository.TeacherRepository;
 import com.nminh.kiemthu.repository.TeacherSalaryRepository;
 import com.nminh.kiemthu.repository.TuitionRepository;
 import com.nminh.kiemthu.service.TeacherSalaryService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +25,12 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class TeacherSalaryServiceImpl implements TeacherSalaryService {
 
     @Autowired
@@ -64,6 +67,7 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
         response.setTotalHoursTeaching(roundToTwoDecimalPlaces(teacherSalary.getTotalHoursTeaching()));
         response.setTotalSalary(roundToTwoDecimalPlaces(teacherSalary.getTotalSalary()));
         response.setStatusPayment(teacherSalary.getStatusPayment());
+        response.setId(teacherSalary.getId());
         return response;
     }
 
@@ -95,25 +99,35 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
         }
 
         int soLopGiangDay = classRoomRepository.countBySemesterIdAndTeacherId(semesterId, teacherId);
-        int soTietGiangDay = 0;
         double soTietQuyDoi = 0;
         for (ClassRoom classRoom : classRooms) {
-            soTietGiangDay += classRoom.getSubject().getCredits();
-            soTietQuyDoi += classRoom.getSubject().getCredits() *
+            soTietQuyDoi += classRoom.getSubject().getNumberOfLessons() *
                     (classRoom.getSubject().getModule_coefficient() + classRoom.getClassCoefficient());
         }
         Double heSoGiaoVien = teacher.getDegree().getDegreeCoefficient();
         Long amountPerLesson = getAmountPerLesson(semesterId);
         Double totalMoney = soTietQuyDoi * heSoGiaoVien * amountPerLesson;
 
+        // Kiểm tra bản ghi hiện có để giữ nguyên trạng thái thanh toán
         TeacherSalary teacherSalary = teacherSalaryRepository.findByTeacherIdAndSemesterId(teacherId, semesterId)
-                .orElse(new TeacherSalary());
+                .orElseGet(() -> {
+                    TeacherSalary newSalary = new TeacherSalary();
+                    newSalary.setTeacher(teacher);
+                    newSalary.setSemester(semester);
+                    // Kiểm tra trạng thái từ các bản ghi khác nếu có
+                    Optional<StatusPayment> existingStatus = teacherSalaryRepository.findByTeacherId(teacherId)
+                            .stream()
+                            .filter(s -> s.getStatusPayment() != null)
+                            .map(TeacherSalary::getStatusPayment)
+                            .findFirst();
+                    newSalary.setStatusPayment(existingStatus.orElse(null)); // Giữ trạng thái hiện có nếu có
+                    return newSalary;
+                });
         teacherSalary.setTeacher(teacher);
         teacherSalary.setSemester(semester);
         teacherSalary.setTotalHoursTeaching(soTietQuyDoi);
         teacherSalary.setTotalSalary(totalMoney);
-
-        teacherSalary.setStatusPayment(com.nminh.kiemthu.enums.StatusPayment.CHUA_THANH_TOAN);
+        // Không cập nhật trạng thái thanh toán
 
         TeacherSalary savedSalary = teacherSalaryRepository.save(teacherSalary);
         return mapToTeacherSalaryResponse(savedSalary, classRooms);
@@ -163,7 +177,7 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
 
             double soTietQuyDoi = 0;
             for (ClassRoom classRoom : teacherClassRooms) {
-                soTietQuyDoi += classRoom.getSubject().getCredits() *
+                soTietQuyDoi += classRoom.getSubject().getNumberOfLessons() *
                         (classRoom.getSubject().getModule_coefficient() + classRoom.getClassCoefficient());
             }
             Double heSoGiaoVien = teacher.getDegree().getDegreeCoefficient();
@@ -171,12 +185,24 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
             Double totalMoney = soTietQuyDoi * heSoGiaoVien * amountPerLesson;
 
             TeacherSalary teacherSalary = teacherSalaryRepository.findByTeacherIdAndSemesterId(teacherId, semesterId)
-                    .orElse(new TeacherSalary());
+                    .orElseGet(() -> {
+                        TeacherSalary newSalary = new TeacherSalary();
+                        newSalary.setTeacher(teacher);
+                        newSalary.setSemester(semester);
+                        // Kiểm tra trạng thái từ các bản ghi khác nếu có
+                        Optional<StatusPayment> existingStatus = teacherSalaryRepository.findByTeacherId(teacherId)
+                                .stream()
+                                .filter(s -> s.getStatusPayment() != null)
+                                .map(TeacherSalary::getStatusPayment)
+                                .findFirst();
+                        newSalary.setStatusPayment(existingStatus.orElse(null)); // Giữ trạng thái hiện có nếu có
+                        return newSalary;
+                    });
             teacherSalary.setTeacher(teacher);
             teacherSalary.setSemester(semester);
             teacherSalary.setTotalHoursTeaching(soTietQuyDoi);
             teacherSalary.setTotalSalary(totalMoney);
-            teacherSalary.setStatusPayment(com.nminh.kiemthu.enums.StatusPayment.CHUA_THANH_TOAN);
+            // Không cập nhật trạng thái thanh toán
 
             TeacherSalary savedSalary = teacherSalaryRepository.save(teacherSalary);
             return mapToTeacherSalaryResponse(savedSalary, teacherClassRooms);
@@ -193,6 +219,7 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
             throw new AppException(ErrorCode.PAYMENT_STATUS_UPDATE_NOT_ALLOWED);
         }
 
+        // Cập nhật trạng thái thành DA_THANH_TOAN nếu isPaid là true
         teacherSalary.setStatusPayment(isPaid ? StatusPayment.DA_THANH_TOAN : StatusPayment.CHUA_THANH_TOAN);
         TeacherSalary updatedSalary = teacherSalaryRepository.save(teacherSalary);
         List<ClassRoom> classRooms = classRoomRepository.findBySemesterIdAndTeacherId(
@@ -202,6 +229,7 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
                 .collect(Collectors.toList());
         return mapToTeacherSalaryResponse(updatedSalary, classRooms);
     }
+
     @Override
     public List<TeacherSalaryResponse> getTeacherAllSalariesBySchoolYear(String year) {
         List<Semester> semesters = semesterRepository.findBySchoolYear(year);
@@ -241,7 +269,7 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
                     allClassRooms.addAll(teacherClassRooms);
                     double semesterHours = 0.0;
                     for (ClassRoom classRoom : teacherClassRooms) {
-                        semesterHours += classRoom.getSubject().getCredits() *
+                        semesterHours += classRoom.getSubject().getNumberOfLessons() *
                                 (classRoom.getSubject().getModule_coefficient() + classRoom.getClassCoefficient());
                     }
                     Long amountPerLesson = getAmountPerLesson(semester.getId());
@@ -252,13 +280,26 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
             }
 
             if (!allClassRooms.isEmpty()) {
+                // Sử dụng học kỳ đầu tiên làm đại diện để lưu
                 TeacherSalary teacherSalary = teacherSalaryRepository.findByTeacherIdAndSemesterId(teacherId, semesters.get(0).getId())
-                        .orElse(new TeacherSalary());
+                        .orElseGet(() -> {
+                            TeacherSalary newSalary = new TeacherSalary();
+                            newSalary.setTeacher(teacher);
+                            newSalary.setSemester(semesters.get(0));
+                            // Kiểm tra trạng thái từ các bản ghi khác nếu có
+                            Optional<StatusPayment> existingStatus = teacherSalaryRepository.findByTeacherId(teacherId)
+                                    .stream()
+                                    .filter(s -> s.getStatusPayment() != null)
+                                    .map(TeacherSalary::getStatusPayment)
+                                    .findFirst();
+                            newSalary.setStatusPayment(existingStatus.orElse(null)); // Giữ trạng thái hiện có nếu có
+                            return newSalary;
+                        });
                 teacherSalary.setTeacher(teacher);
-                teacherSalary.setSemester(semesters.get(0)); // Sử dụng học kỳ đầu tiên làm đại diện
+                teacherSalary.setSemester(semesters.get(0));
                 teacherSalary.setTotalHoursTeaching(totalHoursTeaching);
                 teacherSalary.setTotalSalary(totalSalary);
-                teacherSalary.setStatusPayment(StatusPayment.CHUA_THANH_TOAN);
+                // Không cập nhật trạng thái thanh toán
 
                 TeacherSalary savedSalary = teacherSalaryRepository.save(teacherSalary);
                 teacherSalaryResponses.add(mapToTeacherSalaryResponse(savedSalary, allClassRooms));
@@ -267,6 +308,7 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
 
         return teacherSalaryResponses;
     }
+
     @Override
     public List<TeacherSalaryResponse> calculateTeacherAllSalaryByDepartment(Long departmentId) {
         // Lấy tất cả lớp trong khoa
@@ -302,7 +344,7 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
 
             double soTietQuyDoi = 0;
             for (ClassRoom classRoom : teacherClassRooms) {
-                soTietQuyDoi += classRoom.getSubject().getCredits() *
+                soTietQuyDoi += classRoom.getSubject().getNumberOfLessons() *
                         (classRoom.getSubject().getModule_coefficient() + classRoom.getClassCoefficient());
             }
             Double heSoGiaoVien = teacher.getDegree().getDegreeCoefficient();
@@ -310,12 +352,24 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
             Double totalMoney = soTietQuyDoi * heSoGiaoVien * amountPerLesson;
 
             TeacherSalary teacherSalary = teacherSalaryRepository.findByTeacherIdAndSemesterId(teacherId, semesterId)
-                    .orElse(new TeacherSalary());
+                    .orElseGet(() -> {
+                        TeacherSalary newSalary = new TeacherSalary();
+                        newSalary.setTeacher(teacher);
+                        newSalary.setSemester(semester);
+                        // Kiểm tra trạng thái từ các bản ghi khác nếu có
+                        Optional<StatusPayment> existingStatus = teacherSalaryRepository.findByTeacherId(teacherId)
+                                .stream()
+                                .filter(s -> s.getStatusPayment() != null)
+                                .map(TeacherSalary::getStatusPayment)
+                                .findFirst();
+                        newSalary.setStatusPayment(existingStatus.orElse(null)); // Giữ trạng thái hiện có nếu có
+                        return newSalary;
+                    });
             teacherSalary.setTeacher(teacher);
             teacherSalary.setSemester(semester);
             teacherSalary.setTotalHoursTeaching(soTietQuyDoi);
             teacherSalary.setTotalSalary(totalMoney);
-            teacherSalary.setStatusPayment(com.nminh.kiemthu.enums.StatusPayment.CHUA_THANH_TOAN);
+            // Không cập nhật trạng thái thanh toán
 
             TeacherSalary savedSalary = teacherSalaryRepository.save(teacherSalary);
             return mapToTeacherSalaryResponse(savedSalary, teacherClassRooms);

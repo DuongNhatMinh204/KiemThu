@@ -1,4 +1,6 @@
-// Lấy danh sách giảng viên
+/**
+ * Fetch danh sách giảng viên
+ */
 let teachers = [];
 fetch('/admin/teacher/get-all')
     .then(res => res.json())
@@ -7,12 +9,14 @@ fetch('/admin/teacher/get-all')
         fillSelect(document.getElementById('teacherSelect'), teachers, 'id', 'fullName');
     });
 
+/**
+ * Fetch danh sách học kỳ và năm học
+ */
 let semesters = [];
 fetch('/admin/semester/get-all')
     .then(res => res.json())
     .then(json => {
         semesters = json.data || [];
-        // Hiển thị tên học kỳ theo semesterName và schoolYear
         fillSelect(
             document.getElementById('semesterSelect'),
             semesters,
@@ -31,7 +35,6 @@ fetch('/admin/semester/get-all')
             'id',
             s => `${s.semesterName} (${s.schoolYear})`
         );
-        // Lấy danh sách năm học duy nhất
         const years = [...new Set(semesters.map(s => s.schoolYear))].sort();
         fillSelect(
             document.getElementById('yearSelect'),
@@ -41,31 +44,34 @@ fetch('/admin/semester/get-all')
         );
     });
 
-// Lấy danh sách khoa từ API
+/**
+ * Fetch danh sách khoa
+ */
 let departments = [];
 fetch('/admin/department/getAll')
     .then(res => res.json())
     .then(json => {
         departments = json.data || [];
-        // fullName là tên khoa theo API
         fillSelect(document.getElementById('bulkDepartmentSelect'), departments, 'id', 'fullName');
         fillSelect(document.getElementById('departmentSelect'), departments, 'id', 'fullName');
     });
 
-// Helper
+/**
+ * Helper functions
+ */
 function showLoading(show) {
     document.getElementById('loading').style.display = show ? 'block' : 'none';
 }
+
 function showError(container, msg) {
     container.innerHTML = `<div class="error">${msg}</div>`;
 }
+
 function formatCurrency(num) {
     return Number(num).toLocaleString('vi-VN') + " đ";
 }
 
-// Đổ dữ liệu dropdown
 function fillSelect(select, arr, valueField = 'id', labelField = 'name') {
-    // Lấy option mặc định nếu có
     let defaultOption = '';
     if (select.options.length && select.options[0].value === '') {
         defaultOption = select.options[0].outerHTML;
@@ -77,10 +83,10 @@ function fillSelect(select, arr, valueField = 'id', labelField = 'name') {
         })
         .join('');
 }
-fillSelect(document.getElementById('bulkDepartmentSelect'), departments, 'id', 'name');
-fillSelect(document.getElementById('departmentSelect'), departments, 'id', 'name');
 
-// Sidebar navigation
+/**
+ * Sidebar navigation
+ */
 document.querySelectorAll('.sidebar li').forEach(li => {
     li.onclick = function() {
         document.querySelectorAll('.sidebar li').forEach(x => x.classList.remove('active'));
@@ -90,7 +96,9 @@ document.querySelectorAll('.sidebar li').forEach(li => {
     };
 });
 
-// Lấy danh sách giáo viên theo kỳ/khoa/giáo viên
+/**
+ * Fetch danh sách giáo viên theo kỳ/khoa/giáo viên
+ */
 function getTeacherStats({ semesterId, departmentId, teacherId }, callback) {
     let url = `/admin/teacher/getList?semesterId=${semesterId}`;
     if (departmentId) url += `&departmentId=${departmentId}`;
@@ -100,21 +108,27 @@ function getTeacherStats({ semesterId, departmentId, teacherId }, callback) {
         .then(json => callback(json.data || []));
 }
 
-// Lấy danh sách giáo viên theo khoa
+/**
+ * Fetch danh sách giáo viên theo khoa
+ */
 function loadTeachersByDepartment(departmentId, callback) {
     fetch(`/admin/teacher/get-all-of-department/${departmentId}`)
         .then(res => res.json())
         .then(json => callback(json.data || []));
 }
 
-// Lấy thông tin chi tiết giáo viên
+/**
+ * Fetch thông tin chi tiết giáo viên
+ */
 function getTeacherDetail(id, callback) {
     fetch(`/admin/teacher/get/${id}`)
         .then(res => res.json())
         .then(json => callback(json.data));
 }
 
-// Tính lương giáo viên (theo form)
+/**
+ * Tính lương giáo viên (theo form)
+ */
 document.getElementById('calcTeacherForm').onsubmit = function(e) {
     e.preventDefault();
     const teacherId = document.getElementById('teacherSelect').value;
@@ -137,19 +151,19 @@ document.getElementById('calcTeacherForm').onsubmit = function(e) {
                 return;
             }
             resultDiv.innerHTML = `
-        <div class="card">
-          <b>Thông tin giáo viên:</b><br>
-          ID: ${salary.teacherResponse.id} <br>
-          Họ tên: ${salary.teacherResponse.name} <br>
-          Khoa: ${salary.teacherResponse.department} <br>
-          Email: ${salary.teacherResponse.email} <br>
-          Bằng cấp: ${salary.teacherResponse.degree ? salary.teacherResponse.degree.shortName : ""} <br>
-          Lớp dạy: ${(salary.teacherResponse.classRoom || []).join(", ")} <br>
-          <b>Tổng số tiết quy đổi:</b> ${salary.totalHoursTeaching} <br>
-          <b>Tổng tiền lương:</b> ${formatCurrency(salary.totalSalary)} <br>
-          <b>Trạng thái thanh toán:</b> ${salary.statusPayment === "DA_THANH_TOAN" ? "Đã thanh toán" : "Chưa thanh toán"}
-        </div>
-      `;
+                <div class="card">
+                <b>Thông tin giáo viên:</b><br>
+                ID: ${salary.teacherResponse.id} <br>
+                Họ tên: ${salary.teacherResponse.name} <br>
+                Khoa: ${salary.teacherResponse.department} <br>
+                Email: ${salary.teacherResponse.email} <br>
+                Bằng cấp: ${salary.teacherResponse.degree ? salary.teacherResponse.degree.shortName : ""} <br>
+                Lớp dạy: ${(salary.classRoom || []).join(", ")} <br>
+                <b>Tổng số tiết quy đổi:</b> ${salary.totalHoursTeaching} <br>
+                <b>Tổng tiền lương:</b> ${formatCurrency(salary.totalSalary)} <br>
+                <b>Trạng thái thanh toán:</b> ${salary.statusPayment === "DA_THANH_TOAN" ? "Đã thanh toán" : "Chưa thanh toán"}
+                </div>
+            `;
             showLoading(false);
         })
         .catch(() => {
@@ -158,7 +172,9 @@ document.getElementById('calcTeacherForm').onsubmit = function(e) {
         });
 };
 
-// Hiển thị danh sách lương theo học kỳ
+/**
+ * Hiển thị danh sách lương theo học kỳ
+ */
 function renderSalaryTable(data, containerId, filterStatus = "") {
     const container = document.getElementById(containerId);
     if (!data || !data.length) {
@@ -167,6 +183,7 @@ function renderSalaryTable(data, containerId, filterStatus = "") {
     }
     let html = `<table class="data-table">
     <tr>
+      <th>ID Lương</th>
       <th>Tên giáo viên</th>
       <th>Khoa</th>
       <th>Email</th>
@@ -180,23 +197,53 @@ function renderSalaryTable(data, containerId, filterStatus = "") {
     data.forEach(s => {
         if (filterStatus && ((filterStatus === "true" && s.statusPayment !== "DA_THANH_TOAN") || (filterStatus === "false" && s.statusPayment !== "CHUA_THANH_TOAN"))) return;
         html += `<tr>
-      <td>${s.teacherResponse ? s.teacherResponse.name : ""}</td>
-      <td>${s.teacherResponse ? s.teacherResponse.department : ""}</td>
-      <td>${s.teacherResponse ? s.teacherResponse.email : ""}</td>
-      <td>${s.teacherResponse && s.teacherResponse.degree ? s.teacherResponse.degree.shortName : ""}</td>
-      <td>${s.teacherResponse && s.teacherResponse.classRoom ? s.teacherResponse.classRoom.join(", ") : ""}</td>
-      <td>${s.totalHoursTeaching}</td>
-      <td>${formatCurrency(s.totalSalary)}</td>
-      <td>${s.statusPayment === "DA_THANH_TOAN" ? "Đã thanh toán" : "Chưa thanh toán"}</td>
-      <td>
-        ${s.statusPayment === "CHUA_THANH_TOAN" ? `<button onclick="updatePaymentStatus(${s.id}, true)">Xác nhận thanh toán</button>` : ""}
-      </td>
+        <td>${s.id || "N/A"}</td>
+        <td>${s.teacherResponse ? s.teacherResponse.name : ""}</td>
+        <td>${s.teacherResponse ? s.teacherResponse.department : ""}</td>
+        <td>${s.teacherResponse ? s.teacherResponse.email : ""}</td>
+        <td>${s.teacherResponse && s.teacherResponse.degree ? s.teacherResponse.degree.shortName : ""}</td>
+        <td>${s.classRoom ? s.classRoom.join(", ") : ""}</td>
+        <td>${s.totalHoursTeaching}</td>
+        <td>${formatCurrency(s.totalSalary)}</td>
+        <td>${s.statusPayment === "DA_THANH_TOAN" ? "Đã thanh toán" : "Chưa thanh toán"}</td>
+        <td>
+            <button class="show-salary-detail" data-salary='${JSON.stringify(s)}'>Xem chi tiết</button>
+            ${s.statusPayment === "CHUA_THANH_TOAN" ? `<button class="update-payment-status" data-id="${s.id || ''}">Xác nhận thanh toán</button>` : ""}
+        </td>
     </tr>`;
     });
     html += "</table>";
     container.innerHTML = html;
+
+    // Attach event listeners programmatically
+    document.querySelectorAll('.show-salary-detail').forEach(button => {
+        button.addEventListener('click', () => {
+            const salary = JSON.parse(button.getAttribute('data-salary'));
+            showSalaryDetail(salary);
+        });
+    });
+
+    document.querySelectorAll('.update-payment-status').forEach(button => {
+        button.addEventListener('click', () => {
+            const teacherSalaryId = button.getAttribute('data-id');
+            console.log(`Updating payment status for ID: ${teacherSalaryId}`);
+            if (!teacherSalaryId) {
+                alert("Không tìm thấy ID lương giáo viên!");
+                return;
+            }
+            updatePaymentStatus(teacherSalaryId, true);
+        });
+    });
+
+    // Log teacherSalaryId to console for debugging
+    data.forEach(s => {
+        console.log(`TeacherSalaryId: ${s.id || "N/A"}`);
+    });
 }
-// Lọc và hiển thị lương theo học kỳ
+
+/**
+ * Lọc và hiển thị lương theo học kỳ
+ */
 function updateSalarySemesterTable() {
     const semesterId = document.getElementById('semesterListSelect').value;
     const filterStatus = document.getElementById('statusFilterSemester').value;
@@ -217,11 +264,14 @@ function updateSalarySemesterTable() {
             showLoading(false);
         });
 }
+
 document.getElementById('semesterListSelect').onchange = updateSalarySemesterTable;
 document.getElementById('statusFilterSemester').onchange = updateSalarySemesterTable;
 updateSalarySemesterTable();
 
-// Lọc và hiển thị lương theo khoa
+/**
+ * Lọc và hiển thị lương theo khoa
+ */
 function updateSalaryDepartmentTable() {
     const departmentId = document.getElementById('departmentSelect').value;
     const filterStatus = document.getElementById('statusFilterDepartment').value;
@@ -242,22 +292,22 @@ function updateSalaryDepartmentTable() {
             showLoading(false);
         });
 }
+
 document.getElementById('departmentSelect').onchange = updateSalaryDepartmentTable;
 document.getElementById('statusFilterDepartment').onchange = updateSalaryDepartmentTable;
 updateSalaryDepartmentTable();
 
-// Lọc và hiển thị lương theo năm
+/**
+ * Lọc và hiển thị lương theo năm
+ */
 function updateSalaryYearTable() {
     const year = document.getElementById('yearSelect').value;
     const filterStatus = document.getElementById('statusFilterYear').value;
     const container = document.getElementById('salaryYearTable');
-
-    // Kiểm tra xem năm học đã được chọn hay chưa
     if (!year) {
         container.innerHTML = "<div>Vui lòng chọn năm học.</div>";
         return;
     }
-
     showLoading(true);
     fetch(`/teacher-salary/by-schoolYear?year=${encodeURIComponent(year)}`)
         .then(res => {
@@ -270,7 +320,6 @@ function updateSalaryYearTable() {
             return res.json();
         })
         .then(json => {
-            // Kiểm tra cấu trúc dữ liệu trả về
             const data = Array.isArray(json) ? json : json.data || [];
             if (!data.length) {
                 container.innerHTML = "<div>Không có dữ liệu lương cho năm học này.</div>";
@@ -284,43 +333,47 @@ function updateSalaryYearTable() {
             showLoading(false);
         });
 }
+
 document.getElementById('yearSelect').onchange = updateSalaryYearTable;
 document.getElementById('statusFilterYear').onchange = updateSalaryYearTable;
 updateSalaryYearTable();
 
-// Xem chi tiết lương giáo viên
-window.showSalaryDetail = function(teacherId, semesterId) {
-    showLoading(true);
-    getTeacherDetail(teacherId, function(teacher) {
-        getTeacherStats({ semesterId, teacherId }, function(stats) {
-            const salary = stats && stats.length ? stats[0] : null;
-            alert(
-                `Họ tên: ${teacher.fullName}\n` +
-                `Email: ${teacher.email}\n` +
-                `Bằng cấp: ${teacher.degree}\n` +
-                `Khoa: ${teacher.department && teacher.department.name}\n` +
-                `Tổng số tiết: ${salary ? salary.totalHoursTeaching : ''}\n` +
-                `Tổng tiền lương: ${salary ? formatCurrency(salary.totalSalary) : ''}`
-            );
-            showLoading(false);
-        });
-    });
+/**
+ * Xem chi tiết lương giáo viên
+ */
+window.showSalaryDetail = function(salary) {
+    alert(
+        `Họ tên: ${salary.teacherResponse ? salary.teacherResponse.name : ""}\n` +
+        `Email: ${salary.teacherResponse ? salary.teacherResponse.email : ""}\n` +
+        `Bằng cấp: ${salary.teacherResponse && salary.teacherResponse.degree ? salary.teacherResponse.degree.shortName : ""}\n` +
+        `Khoa: ${salary.teacherResponse ? salary.teacherResponse.department : ""}\n` +
+        `Lớp dạy: ${(salary.classRoom || []).join(", ")}\n` +
+        `Tổng số tiết: ${salary.totalHoursTeaching}\n` +
+        `Tổng tiền lương: ${formatCurrency(salary.totalSalary)}\n` +
+        `Trạng thái: ${salary.statusPayment === "DA_THANH_TOAN" ? "Đã thanh toán" : "Chưa thanh toán"}`
+    );
 };
 
-// Đăng xuất
-document.getElementById('logoutBtn').onclick = function() {
-    alert("Đăng xuất thành công!");
-    // window.location.href = '/login';
-};
-
+/**
+ * Cập nhật trạng thái thanh toán
+ */
 window.updatePaymentStatus = function(teacherSalaryId, isPaid) {
+    if (!teacherSalaryId) {
+        alert("ID lương giáo viên không hợp lệ!");
+        showLoading(false);
+        return;
+    }
     showLoading(true);
     fetch(`/teacher-salary/${teacherSalaryId}/payment-status?isPaid=${isPaid}`, {
         method: 'PUT'
     })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("Lỗi khi cập nhật trạng thái thanh toán.");
+            }
+            return res.json();
+        })
         .then(() => {
-            // Sau khi cập nhật, reload lại bảng lương hiện tại
             updateSalarySemesterTable();
             updateSalaryDepartmentTable();
             showLoading(false);
@@ -331,6 +384,9 @@ window.updatePaymentStatus = function(teacherSalaryId, isPaid) {
         });
 };
 
+/**
+ * Tính lương hàng loạt theo học kỳ
+ */
 document.getElementById('bulkCalcSemesterBtn').onclick = function() {
     const semesterId = document.getElementById('semesterListSelect').value;
     if (!semesterId) {
@@ -350,7 +406,9 @@ document.getElementById('bulkCalcSemesterBtn').onclick = function() {
         });
 };
 
-// Tính lương hàng loạt theo khoa
+/**
+ * Tính lương hàng loạt theo khoa
+ */
 document.getElementById('bulkCalcDepartmentOnlyBtn').onclick = function() {
     const departmentId = document.getElementById('bulkDepartmentSelect').value;
     if (!departmentId) {
@@ -370,6 +428,17 @@ document.getElementById('bulkCalcDepartmentOnlyBtn').onclick = function() {
         });
 };
 
+/**
+ * Đăng xuất
+ */
+document.getElementById('logoutBtn').onclick = function() {
+    alert("Đăng xuất thành công!");
+    // window.location.href = '/login';
+};
+
+/**
+ * Ẩn loading khi load trang
+ */
 document.addEventListener('DOMContentLoaded', function() {
     showLoading(false);
 });

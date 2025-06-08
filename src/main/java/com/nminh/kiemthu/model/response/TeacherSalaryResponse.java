@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TeacherSalaryResponse {
+    private Long id;
     private TeacherResponse teacherResponse;
     private List<String> classRoom;
     private double totalHoursTeaching;
