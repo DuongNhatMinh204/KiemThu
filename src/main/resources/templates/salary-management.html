@@ -22,7 +22,7 @@
         <li data-page="salary-semester">Danh sách lương theo học kỳ</li>
         <li data-page="salary-department">Danh sách lương theo khoa</li>
         <li data-page="salary-year">Danh sách lương theo năm</li>
-        <li data-page="bulk-calc">Tính lương hàng loạt</li>
+        <li data-page="tuition-degree">Điều chỉnh tiền dạy/hệ số</li>
       </ul>
     </nav>
     <main class="content">
@@ -60,7 +60,6 @@
               <option value="true">Đã thanh toán</option>
             </select>
           </label>
-          <button id="bulkCalcSemesterBtn">Tính lương hàng loạt</button>
         </div>
         <div id="salarySemesterTable"></div>
       </section>
@@ -80,7 +79,6 @@
               <option value="true">Đã thanh toán</option>
             </select>
           </label>
-          <button id="bulkCalcDepartmentBtn">Tính lương hàng loạt</button>
         </div>
         <div id="salaryDepartmentTable"></div>
       </section>
@@ -103,27 +101,17 @@
         </div>
         <div id="salaryYearTable"></div>
       </section>
-      <!-- Tính lương hàng loạt -->
-      <section id="bulk-calc" class="page">
-        <h2>Tính lương hàng loạt</h2>
-        <p>Chọn học kỳ hoặc khoa để tính lương cho tất cả giáo viên.</p>
+      <!-- Điều chỉnh tiền dạy học và hệ số bằng cấp -->
+      <section id="tuition-degree" class="page">
+        <h2>Điều chỉnh tiền dạy học & hệ số bằng cấp</h2>
         <div>
-          <label>Chọn học kỳ:
-            <select id="bulkSemesterSelect">
-              <option value="">----Chọn học kỳ----</option>
-            </select>
-          </label>
-          <button id="bulkCalcSemesterOnlyBtn">Tính lương học kỳ</button>
+          <h3>Tiền dạy học theo học kỳ</h3>
+          <table id="tuitionTable" class="data-table"></table>
         </div>
         <div>
-          <label>Chọn khoa:
-            <select id="bulkDepartmentSelect">
-              <option value="">---------------Chọn khoa----------------</option>
-            </select>
-          </label>
-          <button id="bulkCalcDepartmentOnlyBtn">Tính lương khoa</button>
+          <h3>Hệ số bằng cấp</h3>
+          <table id="degreeTable" class="data-table"></table>
         </div>
-        <div id="bulkCalcResult"></div>
       </section>
     </main>
   </div>

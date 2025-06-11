@@ -29,12 +29,6 @@ fetch('/admin/semester/get-all')
             'id',
             s => `${s.semesterName} (${s.schoolYear})`
         );
-        fillSelect(
-            document.getElementById('bulkSemesterSelect'),
-            semesters,
-            'id',
-            s => `${s.semesterName} (${s.schoolYear})`
-        );
         const years = [...new Set(semesters.map(s => s.schoolYear))].sort();
         fillSelect(
             document.getElementById('yearSelect'),
@@ -52,7 +46,6 @@ fetch('/admin/department/getAll')
     .then(res => res.json())
     .then(json => {
         departments = json.data || [];
-        fillSelect(document.getElementById('bulkDepartmentSelect'), departments, 'id', 'fullName');
         fillSelect(document.getElementById('departmentSelect'), departments, 'id', 'fullName');
     });
 
@@ -256,7 +249,8 @@ function updateSalarySemesterTable() {
     fetch(`/teacher-salary/by-semester?semesterId=${semesterId}`)
         .then(res => res.json())
         .then(data => {
-            renderSalaryTable(data, 'salarySemesterTable', filterStatus);
+            const salaryData = Array.isArray(data) ? data : (data.data || []);
+            renderSalaryTable(salaryData, 'salarySemesterTable', "");
             showLoading(false);
         })
         .catch(() => {
@@ -285,6 +279,7 @@ function updateSalaryDepartmentTable() {
         .then(res => res.json())
         .then(data => {
             renderSalaryTable(data, 'salaryDepartmentTable', filterStatus);
+            console.log("Dữ liệu bảng lương theo học kỳ:", data); // Thêm dòng này
             showLoading(false);
         })
         .catch(() => {
@@ -385,50 +380,6 @@ window.updatePaymentStatus = function(teacherSalaryId, isPaid) {
 };
 
 /**
- * Tính lương hàng loạt theo học kỳ
- */
-document.getElementById('bulkCalcSemesterBtn').onclick = function() {
-    const semesterId = document.getElementById('semesterListSelect').value;
-    if (!semesterId) {
-        alert("Vui lòng chọn học kỳ.");
-        return;
-    }
-    showLoading(true);
-    fetch(`/teacher-salary/calculate-by-semester/${semesterId}`, { method: 'POST' })
-        .then(res => res.json())
-        .then(() => {
-            updateSalarySemesterTable();
-            showLoading(false);
-        })
-        .catch(() => {
-            alert("Tính lương hàng loạt thất bại!");
-            showLoading(false);
-        });
-};
-
-/**
- * Tính lương hàng loạt theo khoa
- */
-document.getElementById('bulkCalcDepartmentOnlyBtn').onclick = function() {
-    const departmentId = document.getElementById('bulkDepartmentSelect').value;
-    if (!departmentId) {
-        alert("Vui lòng chọn khoa.");
-        return;
-    }
-    showLoading(true);
-    fetch(`/teacher-salary/calculate-by-department/${departmentId}`, { method: 'POST' })
-        .then(res => res.json())
-        .then(() => {
-            updateSalaryDepartmentTable();
-            showLoading(false);
-        })
-        .catch(() => {
-            alert("Tính lương hàng loạt thất bại!");
-            showLoading(false);
-        });
-};
-
-/**
  * Đăng xuất
  */
 document.getElementById('logoutBtn').onclick = function() {
@@ -441,4 +392,108 @@ document.getElementById('logoutBtn').onclick = function() {
  */
 document.addEventListener('DOMContentLoaded', function() {
     showLoading(false);
+});
+
+// Lấy danh sách học phí
+function loadTuitions() {
+    fetch('/tuition/getAll')
+        .then(res => res.json())
+        .then(json => {
+            // Nếu trả về mảng thì dùng luôn, nếu trả về object thì lấy .data
+            const tuitions = Array.isArray(json) ? json : (json.data || []);
+            console.log("Danh sách học phí:", tuitions);
+            renderTuitionTable(tuitions);
+        });
+}
+
+// Hiển thị bảng học phí
+function renderTuitionTable(tuitions) {
+    const table = document.getElementById('tuitionTable');
+    let html = `<tr>
+        <th>ID</th>
+        <th>Học kỳ</th>
+        <th>Tiền/tiết</th>
+        <th>Tiền/tiết trước điều chỉnh</th>
+        <th>Hành động</th>
+    </tr>`;
+    tuitions.forEach(t => {
+        html += `<tr>
+            <td>${t.id}</td>
+            <td>${t.semester ? (t.semester.semesterName + " (" + t.semester.schoolYear + ")") : ""}</td>
+            <td><input type="number" value="${t.money}" min="0" id="tuition-money-${t.id}" style="width:100px"></td>
+            <td>${t.pre_money}</td>
+            <td>
+                <button onclick="updateTuition(${t.id})">Lưu</button>
+            </td>
+        </tr>`;
+    });
+    table.innerHTML = html;
+}
+
+// Cập nhật tiền học phí
+window.updateTuition = function(id) {
+    const money = document.getElementById(`tuition-money-${id}`).value;
+    if (!money || isNaN(money) || money < 0) {
+        alert("Tiền học phí không hợp lệ!");
+        return;
+    }
+    fetch(`/tuition/update/${id}?money=${money}`, { method: 'PUT' })
+        .then(res => res.json())
+        .then(() => {
+            alert("Cập nhật thành công!");
+            loadTuitions();
+        })
+        .catch(() => alert("Cập nhật thất bại!"));
+};
+
+// Lấy danh sách bằng cấp
+function loadDegrees() {
+    fetch('/admin/degree/get-all')
+        .then(res => res.json())
+        .then(json => renderDegreeTable(json.data || []));
+}
+
+// Hiển thị bảng hệ số bằng cấp
+function renderDegreeTable(degrees) {
+    const table = document.getElementById('degreeTable');
+    let html = `<tr>
+        <th>ID</th>
+        <th>Tên viết tắt</th>
+        <th>Tên đầy đủ</th>
+        <th>Hệ số</th>
+        <th>Hành động</th>
+    </tr>`;
+    degrees.forEach(d => {
+        html += `<tr>
+            <td>${d.id}</td>
+            <td>${d.shortName}</td>
+            <td>${d.fullName}</td>
+            <td><input type="number" step="0.01" value="${d.degreeCoefficient}" id="degree-coef-${d.id}" style="width:80px"></td>
+            <td>
+                <button onclick="updateDegreeCoef(${d.id})">Lưu</button>
+            </td>
+        </tr>`;
+    });
+    table.innerHTML = html;
+}
+
+// Cập nhật hệ số bằng cấp
+window.updateDegreeCoef = function(id) {
+    const coef = document.getElementById(`degree-coef-${id}`).value;
+    if (!coef || isNaN(coef) || coef <= 0) {
+        alert("Hệ số không hợp lệ!");
+        return;
+    }
+    fetch(`/admin/degree/setCoefficient/${id}?coefficient=${coef}`, { method: 'PUT' })
+        .then(() => {
+            alert("Cập nhật thành công!");
+            loadDegrees();
+        })
+        .catch(() => alert("Cập nhật thất bại!"));
+};
+
+// Khi vào tab, tự động load dữ liệu
+document.querySelector('li[data-page="tuition-degree"]').addEventListener('click', function() {
+    loadTuitions();
+    loadDegrees();
 });

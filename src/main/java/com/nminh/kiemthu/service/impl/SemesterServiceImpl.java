@@ -1,10 +1,12 @@
 package com.nminh.kiemthu.service.impl;
 
 import com.nminh.kiemthu.entity.Semester;
+import com.nminh.kiemthu.entity.Tuition;
 import com.nminh.kiemthu.enums.ErrorCode;
 import com.nminh.kiemthu.exception.AppException;
 import com.nminh.kiemthu.model.request.SemesterCreateDTO;
 import com.nminh.kiemthu.repository.SemesterRepository;
+import com.nminh.kiemthu.repository.TuitionRepository;
 import com.nminh.kiemthu.service.SemesterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,8 @@ public class SemesterServiceImpl implements SemesterService {
 
     @Autowired
     private SemesterRepository semesterRepository;
-
+    @Autowired
+    private TuitionRepository tuitionRepository;
     @Override
     public Semester createSemester(SemesterCreateDTO semesterCreateDTO) {
         String schoolYear = semesterCreateDTO.getSchoolYear().trim();
@@ -70,6 +73,13 @@ public class SemesterServiceImpl implements SemesterService {
         semester.setTimeBegin(semesterCreateDTO.getTimeBegin());
         semester.setTimeEnd(semesterCreateDTO.getTimeEnd());
 
+        Tuition tuition = new Tuition();
+        Long money = 0L;
+        tuition.setMoney(money);
+        tuition.setPre_money(money);
+        tuition.setSemester(semester);
+
+        tuitionRepository.save(tuition);
         return semesterRepository.save(semester);
     }
     public List<Semester> findBySchoolYear(String schoolYear) {
