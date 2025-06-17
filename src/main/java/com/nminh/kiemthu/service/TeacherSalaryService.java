@@ -1,5 +1,6 @@
 package com.nminh.kiemthu.service;
 
+import com.nminh.kiemthu.model.response.ReportResponse;
 import com.nminh.kiemthu.model.response.TeacherSalaryResponse;
 
 import java.util.List;
@@ -14,4 +15,5 @@ public interface TeacherSalaryService {
     List<TeacherSalaryResponse> getTeacherAllSalariesBySchoolYear(String year);
     List<TeacherSalaryResponse> getTeacherAllSalariesByDepartment(Long departmentId);
     TeacherSalaryResponse updatePaymentStatus(Long teacherSalaryId, boolean isPaid);
+    ReportResponse exportReport(Long teacherSalaryId);
 }

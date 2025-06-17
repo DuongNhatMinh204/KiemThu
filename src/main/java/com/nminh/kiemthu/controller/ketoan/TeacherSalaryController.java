@@ -1,5 +1,6 @@
 package com.nminh.kiemthu.controller.ketoan;
 
+import com.nminh.kiemthu.model.response.ReportResponse;
 import com.nminh.kiemthu.model.response.TeacherSalaryResponse;
 import com.nminh.kiemthu.service.TeacherSalaryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,5 +70,9 @@ public class TeacherSalaryController {
             @PathVariable Long departmentId) {
         List<TeacherSalaryResponse> responses = teacherSalaryService.calculateTeacherAllSalaryByDepartment(departmentId);
         return ResponseEntity.ok(responses);
+    }
+    @GetMapping("/export-report")
+    public ResponseEntity<ReportResponse> exportReport(@RequestParam Long teacherSalaryId){
+        return ResponseEntity.ok(teacherSalaryService.exportReport(teacherSalaryId));
     }
 }

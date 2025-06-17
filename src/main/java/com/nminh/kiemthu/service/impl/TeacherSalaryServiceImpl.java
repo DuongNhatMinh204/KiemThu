@@ -8,6 +8,8 @@ import com.nminh.kiemthu.entity.Tuition;
 import com.nminh.kiemthu.enums.ErrorCode;
 import com.nminh.kiemthu.enums.StatusPayment;
 import com.nminh.kiemthu.exception.AppException;
+import com.nminh.kiemthu.model.response.ClassRoomResponse;
+import com.nminh.kiemthu.model.response.ReportResponse;
 import com.nminh.kiemthu.model.response.TeacherResponse;
 import com.nminh.kiemthu.model.response.TeacherSalaryResponse;
 import com.nminh.kiemthu.repository.ClassRoomRepository;
@@ -439,5 +441,46 @@ public class TeacherSalaryServiceImpl implements TeacherSalaryService {
 
         // Chuyển đổi thành TeacherSalaryResponse và trả về
         return mapToTeacherSalaryResponse(teacherSalary, classRooms);
+    }
+
+    @Override
+    public ReportResponse exportReport(Long teacherSalaryId){
+        TeacherSalary teacherSalary = teacherSalaryRepository.findById(teacherSalaryId)
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_SALARY_NOT_FOUND));
+        TeacherResponse teacherResponse = new TeacherResponse();
+        Teacher teacher = teacherSalary.getTeacher();
+        List<ClassRoom> classRooms = classRoomRepository.findBySemesterIdAndTeacherId(teacherSalary.getSemester().getId(), teacher.getId())
+                .stream()
+                .filter(classRoom -> classRoom.getTeacher() != null && classRoom.getTeacher().getId() != null)
+                .toList();
+        List<ClassRoomResponse> classRoomResponses = new ArrayList<>();
+        for (ClassRoom classRoom : classRooms){
+            ClassRoomResponse classRoomResponse = new ClassRoomResponse();
+
+            classRoomResponse.setClassCoefficient(classRoom.getClassCoefficient());
+            classRoomResponse.setClassName(classRoom.getClassName());
+            classRoomResponse.setSubject(classRoom.getSubject().getSubjectName());
+            classRoomResponse.setSemesterName(classRoom.getSemester().getSemesterName());
+            classRoomResponse.setSchoolYear(classRoom.getSemester().getSchoolYear());
+            classRoomResponse.setNumberOfStudents(classRoom.getNumberOfStudents());
+
+            classRoomResponses.add(classRoomResponse);
+        }
+        teacherResponse.setDepartment(teacher.getDepartment().getFullName());
+        teacherResponse.setName(teacher.getFullName());
+        teacherResponse.setDegree(teacher.getDegree());
+        teacherResponse.setEmail(teacher.getEmail());
+        teacherResponse.setId(teacher.getId());
+
+
+        ReportResponse response = new ReportResponse();
+
+        response.setTeacherResponse(teacherResponse);
+        response.setClassRoomResponses(classRoomResponses);
+        response.setTotalSalary(teacherSalary.getTotalSalary());
+        response.setStatusPayment(teacherSalary.getStatusPayment());
+        response.setTotalHoursTeaching(teacherSalary.getTotalHoursTeaching());
+
+        return response;
     }
 }
