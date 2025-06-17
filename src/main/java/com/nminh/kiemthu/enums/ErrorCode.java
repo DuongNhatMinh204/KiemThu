@@ -34,7 +34,9 @@ public enum ErrorCode {
     NUMBER_OF_CREDIT_NOT_VALID(1026, "credit number must be > 0", HttpStatus.BAD_REQUEST),
     NUMBER_OF_LESSON_NOT_VALID(1027, "lesson must be > 0", HttpStatus.BAD_REQUEST),
     NUMBER_OF_CLASSES_NOT_VALID(1028, "classes must be > 0", HttpStatus.BAD_REQUEST),
-    NUMBER_OF_STUDENT_NOT_VALID(1029, "student must be > 0", HttpStatus.BAD_REQUEST);
+    NUMBER_OF_STUDENT_NOT_VALID(1029, "student must be > 0", HttpStatus.BAD_REQUEST) ,
+    MODULE_COEFFICENT_NOT_VALID(1030, "module coefficent must be >= 0", HttpStatus.BAD_REQUEST),
+    ;
 
     private int code;
     private String message;
