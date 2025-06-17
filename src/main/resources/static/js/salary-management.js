@@ -143,55 +143,78 @@ document.getElementById('calcTeacherForm').onsubmit = function(e) {
                 showLoading(false);
                 return;
             }
-            // Gọi tiếp API lấy chi tiết thống kê lương
-            return fetch(`/teacher-salary/export-report?teacherSalaryId=${teacherSalaryId}`)
-                .then(res => res.json())
-                .then(detail => {
-                    showLoading(false);
-                    // Hiển thị form chi tiết như modal
-                    const salary = detail;
-                    const classRooms = salary.classRoomResponses || salary.classRoom || [];
-                    resultDiv.innerHTML = `
-                        <div style="max-width:650px;padding:32px;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.15);margin:24px auto;">
-                            <h2 style="margin-bottom:24px;">THỐNG KÊ LƯƠNG GIÁO VIÊN</h2>
-                            <b>Thông tin giáo viên</b>
-                            <table style="width:100%;margin-bottom:24px;border-spacing:0 8px;">
-                                <tr><td style="padding:6px 12px;">ID:</td><td style="padding:6px 12px;">${salary.teacherResponse.id}</td></tr>
-                                <tr><td style="padding:6px 12px;">Họ tên:</td><td style="padding:6px 12px;">${salary.teacherResponse.name}</td></tr>
-                                <tr><td style="padding:6px 12px;">Khoa:</td><td style="padding:6px 12px;">${salary.teacherResponse.department}</td></tr>
-                                <tr><td style="padding:6px 12px;">Email:</td><td style="padding:6px 12px;">${salary.teacherResponse.email}</td></tr>
-                                <tr><td style="padding:6px 12px;">Bằng cấp:</td><td style="padding:6px 12px;">${salary.teacherResponse.degree ? salary.teacherResponse.degree.shortName : ""}</td></tr>
-                                <tr><td style="padding:6px 12px;">Hệ số bằng cấp:</td><td style="padding:6px 12px;">${salary.teacherResponse.degree ? salary.teacherResponse.degree.degreeCoefficient : ""}</td></tr>
-                            </table>
-                            <b>Danh sách lớp dạy</b>
-                            <table border="1" style="width:100%;border-collapse:collapse;margin-bottom:24px;">
-                                <tr style="background:#f5f5f5;">
-                                    <th style="padding:8px;">Lớp</th>
-                                    <th style="padding:8px;">Số SV</th>
-                                    <th style="padding:8px;">Hệ số lớp</th>
-                                    <th style="padding:8px;">Học kỳ</th>
-                                    <th style="padding:8px;">Năm học</th>
-                                    <th style="padding:8px;">Môn học</th>
-                                </tr>
-                                ${classRooms.map(c => `
-                                    <tr>
-                                        <td style="padding:8px;">${c.className}</td>
-                                        <td style="padding:8px;">${c.numberOfStudents}</td>
-                                        <td style="padding:8px;">${c.classCoefficient}</td>
-                                        <td style="padding:8px;">${c.semesterName}</td>
-                                        <td style="padding:8px;">${c.schoolYear}</td>
-                                        <td style="padding:8px;">${c.subject}</td>
+            // Hàm hiển thị chi tiết lương (dùng lại khi cần reload)
+            function renderSalaryDetail() {
+                showLoading(true);
+                fetch(`/teacher-salary/export-report?teacherSalaryId=${teacherSalaryId}`)
+                    .then(res => res.json())
+                    .then(salary => {
+                        showLoading(false);
+                        const classRooms = salary.classRoomResponses || salary.classRoom || [];
+                        const isPaid = salary.statusPayment === "DA_THANH_TOAN";
+                        resultDiv.innerHTML = `
+                            <div style="max-width:650px;padding:32px;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.15);margin:24px auto;">
+                                <h2 style="margin-bottom:24px;">THỐNG KÊ LƯƠNG GIÁO VIÊN</h2>
+                                <b>Thông tin giáo viên</b>
+                                <table style="width:100%;margin-bottom:24px;border-spacing:0 8px;">
+                                    <tr><td style="padding:6px 12px;">ID:</td><td style="padding:6px 12px;">${salary.teacherResponse.id}</td></tr>
+                                    <tr><td style="padding:6px 12px;">Họ tên:</td><td style="padding:6px 12px;">${salary.teacherResponse.name}</td></tr>
+                                    <tr><td style="padding:6px 12px;">Khoa:</td><td style="padding:6px 12px;">${salary.teacherResponse.department}</td></tr>
+                                    <tr><td style="padding:6px 12px;">Email:</td><td style="padding:6px 12px;">${salary.teacherResponse.email}</td></tr>
+                                    <tr><td style="padding:6px 12px;">Bằng cấp:</td><td style="padding:6px 12px;">${salary.teacherResponse.degree ? salary.teacherResponse.degree.shortName : ""}</td></tr>
+                                    <tr><td style="padding:6px 12px;">Hệ số bằng cấp:</td><td style="padding:6px 12px;">${salary.teacherResponse.degree ? salary.teacherResponse.degree.degreeCoefficient : ""}</td></tr>
+                                </table>
+                                <b>Danh sách lớp dạy</b>
+                                <table border="1" style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+                                    <tr style="background:#f5f5f5;">
+                                        <th style="padding:8px;">Lớp</th>
+                                        <th style="padding:8px;">Số SV</th>
+                                        <th style="padding:8px;">Hệ số lớp</th>
+                                        <th style="padding:8px;">Học kỳ</th>
+                                        <th style="padding:8px;">Năm học</th>
+                                        <th style="padding:8px;">Môn học</th>
                                     </tr>
-                                `).join('')}
-                            </table>
-                            <div style="margin-bottom:16px;">
-                                <b>Tổng số tiết quy đổi:</b> ${salary.totalHoursTeaching} <br>
-                                <b>Tổng tiền lương:</b> ${formatCurrency(salary.totalSalary)} <br>
-                                <b>Trạng thái thanh toán:</b> ${salary.statusPayment === "DA_THANH_TOAN" ? "Đã thanh toán" : "Chưa thanh toán"}
+                                    ${classRooms.map(c => `
+                                        <tr>
+                                            <td style="padding:8px;">${c.className}</td>
+                                            <td style="padding:8px;">${c.numberOfStudents}</td>
+                                            <td style="padding:8px;">${c.classCoefficient}</td>
+                                            <td style="padding:8px;">${c.semesterName}</td>
+                                            <td style="padding:8px;">${c.schoolYear}</td>
+                                            <td style="padding:8px;">${c.subject}</td>
+                                        </tr>
+                                    `).join('')}
+                                </table>
+                                <div style="margin-bottom:16px;">
+                                    <b>Tổng số tiết quy đổi:</b> ${salary.totalHoursTeaching} <br>
+                                    <b>Tổng tiền lương:</b> ${formatCurrency(salary.totalSalary)} <br>
+                                    <b>Trạng thái thanh toán:</b> ${isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
+                                </div>
+                                ${!isPaid ? `
+                                    <div style="text-align:right;">
+                                        <button id="paySalaryBtn" style="padding:8px 24px;border:none;background:#43a047;color:#fff;border-radius:6px;cursor:pointer;">Thanh toán</button>
+                                    </div>
+                                ` : ""}
                             </div>
-                        </div>
-                    `;
-                });
+                        `;
+                        // Gắn sự kiện cho nút thanh toán nếu chưa thanh toán
+                        if (!isPaid) {
+                            document.getElementById('paySalaryBtn').onclick = function() {
+                                if (confirm("Bạn có chắc chắn muốn xác nhận thanh toán lương cho giáo viên này?")) {
+                                    showLoading(true);
+                                    updatePaymentStatus(teacherSalaryId, true);
+                                    // Đợi cập nhật xong thì reload lại chi tiết
+                                    setTimeout(renderSalaryDetail, 800);
+                                }
+                            };
+                        }
+                    })
+                    .catch(() => {
+                        showLoading(false);
+                        showError(resultDiv, "Không lấy được chi tiết lương giáo viên!");
+                    });
+            }
+            renderSalaryDetail();
         })
         .catch(() => {
             showError(resultDiv, "Có lỗi khi tính lương.");
@@ -222,6 +245,7 @@ function renderSalaryTable(data, containerId, filterStatus = "") {
       <th>Hành động</th>
     </tr>`;
     data.forEach(s => {
+        console.log(s.statusPayment);
         if (filterStatus && ((filterStatus === "true" && s.statusPayment !== "DA_THANH_TOAN") || (filterStatus === "false" && s.statusPayment !== "CHUA_THANH_TOAN"))) return;
         html += `<tr>
         <td>${s.id || "N/A"}</td>
@@ -232,7 +256,7 @@ function renderSalaryTable(data, containerId, filterStatus = "") {
         <td>${s.classRoom ? s.classRoom.join(", ") : ""}</td>
         <td>${s.totalHoursTeaching}</td>
         <td>${formatCurrency(s.totalSalary)}</td>
-        <td>${s.statusPayment === "DA_THAN_TOAN" ? "Đã thanh toán" : "Chưa thanh toán"}</td>
+        <td>${s.statusPayment === "DA_THANH_TOAN" ? "Đã thanh toán" : "Chưa thanh toán"}</td>
         <td>
             <button class="show-salary-detail" data-salary='${JSON.stringify(s)}'>Xem chi tiết</button>
             ${s.statusPayment === "CHUA_THANH_TOAN" ? `<button class="update-payment-status" data-id="${s.id || ''}">Xác nhận thanh toán</button>` : ""}
