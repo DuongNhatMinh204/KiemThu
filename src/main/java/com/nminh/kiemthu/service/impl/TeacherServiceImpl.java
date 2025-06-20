@@ -34,6 +34,9 @@ public class TeacherServiceImpl implements TeacherService {
     @Autowired
     private DegreeRepository degreeRepository;
 
+    @Autowired
+    private TuitionRepository tuitionRepository;
+
     @Override
     public Teacher createTeacherAccount(TeacherDTO teacherDTO) {
         Department department = departmentRepository.findById(teacherDTO.getDepartmentId())
@@ -86,6 +89,12 @@ public class TeacherServiceImpl implements TeacherService {
         return "Teacher deleted";
     }
 
+    private Long getAmountPerLesson(Long semesterId) {
+        return tuitionRepository.findBySemesterId(semesterId)
+                .map(Tuition::getMoney)
+                .orElseThrow(() -> new AppException(ErrorCode.TUITION_NOT_FOUND));
+    }
+
     @Override
     public InfoTeacherResponseDTO getInfoTeacher(Long semesterId, Long departmentId, Long teacherId) {
 
@@ -101,14 +110,14 @@ public class TeacherServiceImpl implements TeacherService {
         List<ClassRoom> listCacLopGiangDay = classRoomRepository.findBySemesterIdAndTeacherId(semesterId, teacherId);
         double soTietQuyDoi = 0 ;
         for(ClassRoom classRoom : listCacLopGiangDay) {
-            soTietGiangDay += classRoom.getSubject().getCredits() ; // bao nhiêu tín là bấy nhiêu tieets
-            // so tiet quy doi = so tiet thuc te * ( he so hp + he so lop
-            soTietQuyDoi += classRoom.getSubject().getCredits() * (classRoom.getSubject().getModule_coefficient() + classRoom.getClassCoefficient()) ;
+            soTietQuyDoi += classRoom.getSubject().getNumberOfLessons() *
+                    (classRoom.getSubject().getModule_coefficient() + classRoom.getClassCoefficient());
         }
 
         Double heSoGiaoVien = teacher.getDegree().getDegreeCoefficient();
+        Long amountPerLesson = getAmountPerLesson(semesterId);
 
-        Double total_money = soTietQuyDoi*heSoGiaoVien*Constant.TIEN_DAY_MOT_TIET ;
+        Double total_money = soTietQuyDoi*heSoGiaoVien*amountPerLesson ;
 
         InfoTeacherResponseDTO infoTeacherResponseDTO = new InfoTeacherResponseDTO();
 

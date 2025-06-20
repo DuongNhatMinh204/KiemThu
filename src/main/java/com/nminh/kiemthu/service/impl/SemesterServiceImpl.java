@@ -1,10 +1,12 @@
 package com.nminh.kiemthu.service.impl;
 
 import com.nminh.kiemthu.entity.Semester;
+import com.nminh.kiemthu.entity.Tuition;
 import com.nminh.kiemthu.enums.ErrorCode;
 import com.nminh.kiemthu.exception.AppException;
 import com.nminh.kiemthu.model.request.SemesterCreateDTO;
 import com.nminh.kiemthu.repository.SemesterRepository;
+import com.nminh.kiemthu.repository.TuitionRepository;
 import com.nminh.kiemthu.service.SemesterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,8 @@ public class SemesterServiceImpl implements SemesterService {
 
     @Autowired
     private SemesterRepository semesterRepository;
-
+    @Autowired
+    private TuitionRepository tuitionRepository;
     @Override
     public Semester createSemester(SemesterCreateDTO semesterCreateDTO) {
         String schoolYear = semesterCreateDTO.getSchoolYear().trim();
@@ -56,7 +59,7 @@ public class SemesterServiceImpl implements SemesterService {
                 }
                 // nếu tgian bắt đầu ở giữa thời gian bắt đầu kì  và  thời gian kết thúc kì khác
                 if(semesterCreateDTO.getTimeBegin().isAfter(s.getTimeBegin()) && semesterCreateDTO.getTimeEnd().isBefore(s.getTimeEnd())) {
-                    throw new AppException(ErrorCode.TIME_BEGINg_INVALID) ;
+                    throw new AppException(ErrorCode.TIME_BEGIN_INVALID) ;
                 }
                 // nếu thời gian kết thúc ở giữa thời gian bắt đầu kì và thời gian kết thúc kì khác
                 if(semesterCreateDTO.getTimeEnd().isAfter(s.getTimeBegin()) && semesterCreateDTO.getTimeBegin().isBefore(s.getTimeEnd())) {
@@ -70,7 +73,15 @@ public class SemesterServiceImpl implements SemesterService {
         semester.setTimeBegin(semesterCreateDTO.getTimeBegin());
         semester.setTimeEnd(semesterCreateDTO.getTimeEnd());
 
-        return semesterRepository.save(semester);
+        Tuition tuition = new Tuition();
+        Long money = 0L;
+        tuition.setMoney(money);
+        tuition.setPre_money(money);
+        tuition.setSemester(semester);
+
+        semesterRepository.save(semester);
+        tuitionRepository.save(tuition);
+        return semester;
     }
     public List<Semester> findBySchoolYear(String schoolYear) {
         String schoolYearToFind = schoolYear.trim() ;

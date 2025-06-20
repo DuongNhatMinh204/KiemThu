@@ -15,5 +15,6 @@ import java.util.Optional;
 public interface TeacherSalaryRepository extends JpaRepository<TeacherSalary, Long> {
     Optional<TeacherSalary> findByTeacherIdAndSemesterId(Long teacherId, Long semesterId);
     List<TeacherSalary> findBySemester(Semester semester);
+    List<TeacherSalary> findByTeacherId(Long id);
 }
 

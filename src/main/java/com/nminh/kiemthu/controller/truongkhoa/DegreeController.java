@@ -51,4 +51,8 @@ public class DegreeController {
         apiResponse.setData(degreeService.update(id, degreeUpdateDTO));
         return apiResponse;
     }
+    @PutMapping("/setCoefficient/{id}")
+    public void setDegreeCoefficient(@PathVariable Long id, @RequestParam Double coefficient){
+        degreeService.setDegreeCoefficient(id, coefficient);
+    }
 }

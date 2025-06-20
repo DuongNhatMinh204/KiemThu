@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quản lý tiền lương giáo viên</title>
+  <link rel="stylesheet" href="/css/salary-management.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+  <div class="header">
+    <span class="title">Quản lý tiền lương giáo viên</span>
+    <div class="user-info">
+      <span id="accountantName">Nguyễn Kế Toán</span>
+      <button id="logoutBtn"><span class="material-icons">logout</span></button>
+    </div>
+  </div>
+  <div class="container">
+    <nav class="sidebar">
+      <ul>
+        <li class="active" data-page="calc-teacher">Tính lương giáo viên</li>
+        <li data-page="salary-semester">Danh sách lương theo học kỳ</li>
+        <li data-page="salary-department">Danh sách lương theo khoa</li>
+        <li data-page="salary-year">Danh sách lương theo năm</li>
+        <li data-page="tuition-degree">Điều chỉnh tiền dạy/hệ số</li>
+      </ul>
+    </nav>
+    <main class="content">
+      <!-- Tính lương giáo viên -->
+      <section id="calc-teacher" class="page active">
+        <h2>Tính lương giáo viên</h2>
+        <form id="calcTeacherForm">
+          <label>Chọn giáo viên:
+            <select id="teacherSelect" required>
+              <option value="">----Chọn giáo viên----</option>
+            </select>
+          </label>
+          <label>Chọn học kỳ:
+            <select id="semesterSelect" required>
+              <option value="">----Chọn học kỳ----</option>
+            </select>
+          </label>
+          <button type="submit">Tính lương</button>
+        </form>
+        <div id="teacherSalaryResult"></div>
+      </section>
+      <!-- Danh sách lương theo học kỳ -->
+      <section id="salary-semester" class="page">
+        <h2>Danh sách lương theo học kỳ</h2>
+        <div class="filters">
+          <label>Chọn học kỳ:
+            <select id="semesterListSelect">
+              <option value="">----Chọn học kỳ----</option>
+            </select>
+          </label>
+          <label>Lọc trạng thái:
+            <select id="statusFilterSemester">
+              <option value="">Tất cả</option>
+              <option value="false">Chưa thanh toán</option>
+              <option value="true">Đã thanh toán</option>
+            </select>
+          </label>
+        </div>
+        <div id="salarySemesterTable"></div>
+      </section>
+      <!-- Danh sách lương theo khoa -->
+      <section id="salary-department" class="page">
+        <h2>Danh sách lương theo khoa</h2>
+        <div class="filters">
+          <label>Chọn khoa:
+            <select id="departmentSelect">
+              <option value="">----------------Chọn khoa----------------</option>
+            </select>
+          </label>
+          <label>Lọc trạng thái:
+            <select id="statusFilterDepartment">
+              <option value="">Tất cả</option>
+              <option value="false">Chưa thanh toán</option>
+              <option value="true">Đã thanh toán</option>
+            </select>
+          </label>
+        </div>
+        <div id="salaryDepartmentTable"></div>
+      </section>
+      <!-- Danh sách lương theo năm -->
+      <section id="salary-year" class="page">
+        <h2>Danh sách lương theo năm</h2>
+        <div class="filters">
+          <label>Chọn năm:
+            <select id="yearSelect">
+              <option value="">----Chọn năm----</option>
+            </select>
+          </label>
+          <label>Lọc trạng thái:
+            <select id="statusFilterYear">
+              <option value="">Tất cả</option>
+              <option value="false">Chưa thanh toán</option>
+              <option value="true">Đã thanh toán</option>
+            </select>
+          </label>
+        </div>
+        <div id="salaryYearTable"></div>
+      </section>
+      <!-- Điều chỉnh tiền dạy học và hệ số bằng cấp -->
+      <section id="tuition-degree" class="page">
+        <h2>Điều chỉnh tiền dạy học & hệ số bằng cấp</h2>
+        <div>
+          <h3>Tiền dạy học theo học kỳ</h3>
+          <table id="tuitionTable" class="data-table"></table>
+        </div>
+        <div>
+          <h3>Hệ số bằng cấp</h3>
+          <table id="degreeTable" class="data-table"></table>
+        </div>
+      </section>
+    </main>
+  </div>
+  <!-- Popup cập nhật trạng thái -->
+  <div id="statusModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h3>Cập nhật trạng thái thanh toán</h3>
+      <div>
+        <label>Trạng thái hiện tại:
+          <input id="currentStatus" disabled>
+        </label>
+      </div>
+      <div>
+        <label>Trạng thái mới:
+          <select id="newStatusSelect">
+            <option value="true">Đã thanh toán</option>
+            <option value="false">Chưa thanh toán</option>
+          </select>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button id="saveStatusBtn">Lưu</button>
+        <button id="cancelStatusBtn">Hủy</button>
+      </div>
+      <div id="modalError" class="error"></div>
+    </div>
+  </div>
+  <div id="loading" class="loading">Đang tải...</div>
+  <script src="/js/salary-management.js"></script>
+</body>
+</html>

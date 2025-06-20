@@ -9,4 +9,8 @@ public class WebController {
     public String admin() {
         return "truongkhoa";
     }
+    @GetMapping("/ketoan")
+    public String ketoan(){
+        return "salary-management";
+    }
 }

@@ -9,14 +9,13 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TeacherSalaryResponse {
-    private Long id;
+@Getter
+@Setter
+public class ReportResponse {
     private TeacherResponse teacherResponse;
-    private List<String> classRoom;
+    private List<ClassRoomResponse> classRoomResponses;
     private double totalHoursTeaching;
     private double totalSalary;
     private StatusPayment statusPayment;
