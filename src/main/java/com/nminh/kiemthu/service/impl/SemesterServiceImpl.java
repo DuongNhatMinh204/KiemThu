@@ -79,8 +79,9 @@ public class SemesterServiceImpl implements SemesterService {
         tuition.setPre_money(money);
         tuition.setSemester(semester);
 
+        semesterRepository.save(semester);
         tuitionRepository.save(tuition);
-        return semesterRepository.save(semester);
+        return semester;
     }
     public List<Semester> findBySchoolYear(String schoolYear) {
         String schoolYearToFind = schoolYear.trim() ;
