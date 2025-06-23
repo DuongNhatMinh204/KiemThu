@@ -112,6 +112,7 @@ public class TeacherServiceImpl implements TeacherService {
         for(ClassRoom classRoom : listCacLopGiangDay) {
             soTietQuyDoi += classRoom.getSubject().getNumberOfLessons() *
                     (classRoom.getSubject().getModule_coefficient() + classRoom.getClassCoefficient());
+            soTietGiangDay += classRoom.getSubject().getNumberOfLessons();
         }
 
         Double heSoGiaoVien = teacher.getDegree().getDegreeCoefficient();
