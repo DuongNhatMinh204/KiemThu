@@ -8,9 +8,8 @@ from selenium.webdriver.support import expected_conditions as EC
 class SalaryManagementTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # Đường dẫn tới chromedriver nếu cần
         cls.driver = webdriver.Chrome()
-        cls.driver.get("http://localhost:8080/ketoan")  # Đổi lại port nếu khác
+        cls.driver.get("http://localhost:8080/ketoan")
 
     @classmethod
     def tearDownClass(cls):
@@ -33,11 +32,9 @@ class SalaryManagementTest(unittest.TestCase):
         time.sleep(1)
         teacher_select = Select(driver.find_element(By.ID, "teacherSelect"))
         semester_select = Select(driver.find_element(By.ID, "semesterSelect"))
-        # Chọn option khác option đầu tiên (giả sử có dữ liệu)
         teacher_select.select_by_index(1)
         semester_select.select_by_index(1)
         driver.find_element(By.ID, "calcTeacherForm").submit()
-        # Đợi kết quả hiện ra
         WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.ID, "teacherSalaryResult"))
         )
