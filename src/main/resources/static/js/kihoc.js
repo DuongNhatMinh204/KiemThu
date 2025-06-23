@@ -98,14 +98,28 @@ function editSemester(id, name, year, begin, end) {
     document.getElementById('timeEnd').value = end;
     document.getElementById('semesterFormPanel').style.display = 'block';
 }
-
+function isValidDateFormat(dateStr) {
+    const regex =  /^\d{2}-\d{2}-\d{4}$/;
+    return regex.test(dateStr) ;
+}
 function submitSemester() {
     const id = document.getElementById('semesterId').value;
+    const timeBegin = document.getElementById('timeBegin').value;
+    const timeEnd = document.getElementById('timeEnd').value;
+
+    console.log("timeBegin =", timeBegin);
+    console.log("timeEnd =", timeEnd);
+
+    // Validate date format
+    if (!isValidDateFormat(timeBegin) || !isValidDateFormat(timeEnd)) {
+        alert('Lỗi: Ngày bắt đầu và kết thúc ko hợp lệ');
+        return;
+    }
     const payload = {
         semesterName: document.getElementById('semesterName').value,
         schoolYear: document.getElementById('schoolYear').value,
-        timeBegin: document.getElementById('timeBegin').value,
-        timeEnd: document.getElementById('timeEnd').value
+        timeBegin: timeBegin,
+        timeEnd: timeEnd
     };
 
     const url = id ? `/admin/semester/update/${id}` : '/admin/semester/create';

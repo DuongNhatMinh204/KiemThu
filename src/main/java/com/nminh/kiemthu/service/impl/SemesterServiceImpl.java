@@ -25,6 +25,9 @@ public class SemesterServiceImpl implements SemesterService {
         String schoolYear = semesterCreateDTO.getSchoolYear().trim();
         String[] years = schoolYear.split("-");
 
+        if(semesterCreateDTO.getTimeBegin().isAfter(semesterCreateDTO.getTimeEnd())) {
+            throw new AppException(ErrorCode.TIME_INVALID) ;
+        }
         if (years.length != 2) {
             throw new AppException(ErrorCode.SCHOOL_YEAR_INVALID);
         }
@@ -34,7 +37,7 @@ public class SemesterServiceImpl implements SemesterService {
             int endYear = Integer.parseInt(years[1]);
 
             if (endYear - startYear != 1) {
-                throw new AppException(ErrorCode.SCHOOL_YEAR_INVALID); // Bạn cần thêm mã lỗi này
+                throw new AppException(ErrorCode.SCHOOL_YEAR_INVALID);
             }
         } catch (NumberFormatException e) {
             throw new AppException(ErrorCode.SCHOOL_YEAR_INVALID);
